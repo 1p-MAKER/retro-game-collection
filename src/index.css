@@ -1,39 +1,27 @@
 :root {
-  /* NEON CYBERPUNK Palette */
-  --color-black: #050510;
-  --color-dark-blue: #0c0c20;
-  --color-dark-purple: #2a0a2e;
-  --color-dark-green: #0a2e1d;
-  --color-brown: #3d1515;
-  /* Replaced with deep red-brown */
-  --color-dark-gray: #1a1a2e;
-  --color-light-gray: #8892b0;
-  --color-white: #e6f1ff;
-
-  /* NEON ACCENTS */
-  --color-red: #ff0055;
-  --color-orange: #ff9900;
-  --color-yellow: #faff00;
-  /* Laser Yellow */
-  --color-green: #00ff66;
-  /* Neon Green */
-  --color-blue: #00ffff;
-  /* Cyan */
-  --color-indigo: #bc13fe;
-  /* Neon Purple */
-  --color-pink: #ff0099;
-  /* Hot Pink */
-  --color-peach: #ff99cc;
+  /* PICO-8 Color Palette */
+  --color-black: #000000;
+  --color-dark-blue: #1D2B53;
+  --color-dark-purple: #7E2553;
+  --color-dark-green: #008751;
+  --color-brown: #AB5236;
+  --color-dark-gray: #5F574F;
+  --color-light-gray: #C2C3C7;
+  --color-white: #FFF1E8;
+  --color-red: #FF004D;
+  --color-orange: #FFA300;
+  --color-yellow: #FFEC27;
+  --color-green: #00E436;
+  --color-blue: #29ADFF;
+  --color-indigo: #83769C;
+  --color-pink: #FF77A8;
+  --color-peach: #FFCCAA;
 
   /* App Specific */
-  --font-main: "Inter", system-ui, sans-serif;
+  --font-main: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
   --app-bg: var(--color-black);
   --text-main: var(--color-light-gray);
-  --text-highlight: var(--color-blue);
-
-  /* Glow Effects */
-  --glow-text: 0 0 5px var(--color-blue), 0 0 10px var(--color-blue);
-  --glow-box: 0 0 10px rgba(0, 255, 255, 0.3), 0 0 20px rgba(0, 255, 255, 0.1);
+  --text-highlight: var(--color-white);
 
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -42,6 +30,7 @@
 * {
   box-sizing: border-box;
   user-select: none;
+  /* ゲーム向けにテキスト選択を無効化 */
   -webkit-touch-callout: none;
 }
 
@@ -49,14 +38,10 @@ body {
   margin: 0;
   padding: 0;
   background-color: var(--app-bg);
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-    repeating-linear-gradient(0deg, transparent, transparent 1px, #1a1a2e 1px, #1a1a2e 2px);
-  background-size: 100% 4px;
-  /* Scanline background */
   color: var(--text-main);
   font-family: var(--font-main);
   overscroll-behavior: none;
+  /* スマホでのバウンススクロール防止 */
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -72,88 +57,28 @@ body {
   flex-direction: column;
 }
 
-/* CRT Overlay Effect */
-body::after {
-  content: " ";
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-  z-index: 9999;
-  background-size: 100% 2px, 3px 100%;
-  pointer-events: none;
-}
-
-/* Flicker Animation */
-@keyframes flicker {
-  0% {
-    opacity: 0.97;
-  }
-
-  5% {
-    opacity: 0.95;
-  }
-
-  10% {
-    opacity: 0.9;
-  }
-
-  15% {
-    opacity: 0.95;
-  }
-
-  20% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.95;
-  }
-
-  80% {
-    opacity: 0.9;
-  }
-
-  90% {
-    opacity: 0.95;
-  }
-
-  100% {
-    opacity: 0.98;
-  }
-}
-
-#root {
-  animation: flicker 0.15s infinite;
-}
-
 /* Pixel Art Image Rendering */
 canvas {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;
-  filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.2));
-  /* Subtle canvas glow */
+  image-rendering: crisp-edges;
 }
 
-/* Scrollbar customization */
+/* Scrollbar customization (optional) */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-black);
-  border-left: 1px solid var(--color-dark-blue);
+  background: var(--color-dark-blue);
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--color-indigo);
-  border: 1px solid var(--color-blue);
-  box-shadow: 0 0 5px var(--color-indigo);
-  border-radius: 0;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-blue);
+  background: var(--color-light-gray);
 }
