@@ -73,7 +73,10 @@ export const GameScreen: React.FC = () => {
 
                 {/* Pause Button (Top Right, below Safe Area) */}
                 <button
-                    onClick={() => setPaused(true)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setPaused(true);
+                    }}
                     style={{
                         position: 'absolute',
                         top: '10px',
@@ -98,13 +101,16 @@ export const GameScreen: React.FC = () => {
 
                 {/* Pause Menu Overlay */}
                 {paused && (
-                    <div style={{
-                        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        zIndex: 100,
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                        gap: '20px'
-                    }}>
+                    <div
+                        onClick={(e) => e.stopPropagation()} // Prevent clicks on pause menu from reaching game
+                        style={{
+                            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            zIndex: 1000,
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                            gap: '20px'
+                        }}
+                    >
                         <h2 style={{ color: '#FFF1E8' }}>PAUSED</h2>
                         <RetroButton onClick={() => setPaused(false)}>RESUME</RetroButton>
                         <RetroButton variant="secondary" onClick={() => navigate('/menu')}>{t.ui.exit}</RetroButton>

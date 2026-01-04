@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/useGameStore';
 import { GameCanvas } from '../../components/layout/GameCanvas';
 
-export const CatchDropGame: React.FC = () => {
+export const CatchDropGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const navigate = useNavigate();
     const { updateGameProgress } = useGameStore();
     const gameLogic = useRef<CatchDropLogic | null>(null);
@@ -85,7 +85,7 @@ export const CatchDropGame: React.FC = () => {
     };
 
     const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
-        if (!gameLogic.current) return;
+        if (!gameLogic.current || paused) return;
         let clientX;
         if ('touches' in e) clientX = e.touches[0].clientX;
         else clientX = (e as React.MouseEvent).clientX;
@@ -102,12 +102,12 @@ export const CatchDropGame: React.FC = () => {
             onTouchMove={handleTouchMove}
             onMouseDown={handleTouchMove}
             onMouseMove={(e) => {
-                if (e.buttons === 1) handleTouchMove(e);
+                if (!paused && e.buttons === 1) handleTouchMove(e);
             }}
         >
-            <div style={{ position: 'absolute', top: 5, right: 10, color: 'white', zIndex: 10 }}>Score: {uiState.score}</div>
+            <div style={{ position: 'absolute', top: 10, left: 10, color: 'white', zIndex: 10, fontFamily: 'monospace' }}>Score: {uiState.score}</div>
 
-            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} />
+            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} paused={paused} />
 
             {(uiState.state === 'gameover' || uiState.state === 'cleared') && (
                 <div style={{

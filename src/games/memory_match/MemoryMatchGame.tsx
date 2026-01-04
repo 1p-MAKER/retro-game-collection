@@ -8,7 +8,7 @@ import { GameCanvas } from '../../components/layout/GameCanvas'; // Using for co
 // Actually DOM is easier for flip animations but Canvas is good for unified game loop.
 // Let's use Canvas for consistency with other games.
 
-export const MemoryMatchGame: React.FC = () => {
+export const MemoryMatchGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const navigate = useNavigate();
     const { updateGameProgress } = useGameStore();
     const gameLogic = useRef<MemoryMatchLogic | null>(null);
@@ -105,7 +105,7 @@ export const MemoryMatchGame: React.FC = () => {
     };
 
     const handleClick = (e: React.MouseEvent | React.TouchEvent) => {
-        if (!gameLogic.current) return;
+        if (!gameLogic.current || paused) return;
         let clientX, clientY;
         if ('touches' in e) {
             clientX = e.touches[0].clientX;
@@ -149,10 +149,11 @@ export const MemoryMatchGame: React.FC = () => {
             onMouseDown={handleClick}
             onTouchStart={handleClick}
         >
-            <div style={{ position: 'absolute', top: 5, right: 10, color: 'white', zIndex: 10 }}>Score: {uiState.score}</div>
-            <div style={{ position: 'absolute', top: 5, left: 10, color: 'white', zIndex: 10 }}>Time: {uiState.timeLeft}</div>
+            <div style={{ position: 'absolute', top: 10, left: 10, color: 'white', zIndex: 10, fontFamily: 'monospace', pointerEvents: 'none' }}>
+                Time: {uiState.timeLeft}  Score: {uiState.score}
+            </div>
 
-            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} />
+            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} paused={paused} />
 
             {(uiState.state === 'gameover' || uiState.state === 'cleared') && (
                 <div style={{

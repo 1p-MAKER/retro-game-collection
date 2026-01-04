@@ -92,7 +92,7 @@ export const BreakoutGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
         }
     };
 
-    const handleTouch = (e: React.TouchEvent | React.MouseEvent) => {
+    const handleTouch = (e: React.TouchEvent | React.MouseEvent | TouchEvent) => {
         if (!gameLogic.current || paused) return;
 
         // Calculate X relative to canvas
@@ -117,7 +117,7 @@ export const BreakoutGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
             {/* HUD Overlay */}
             <div style={{
                 position: 'absolute', top: 0, left: 0, width: '100%', padding: '10px',
-                display: 'flex', justifyContent: 'space-between', color: 'white', pointerEvents: 'none',
+                display: 'flex', gap: '20px', color: 'white', pointerEvents: 'none',
                 fontFamily: 'monospace', fontSize: '16px', textShadow: '1px 1px 0 #000'
             }}>
                 <span>SCORE: {uiState.score}</span>
@@ -136,7 +136,7 @@ export const BreakoutGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
                     if (!paused) gameLogic.current?.launch();
                 }}
                 onMouseMove={(e) => {
-                    // Check button pressed
+                    if (paused) return;
                     if (e.buttons === 1) handleTouch(e);
                 }}
             >

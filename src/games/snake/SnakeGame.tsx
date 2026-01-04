@@ -6,7 +6,7 @@ import { RetroButton } from '../../components/ui/RetroButton';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/useGameStore';
 
-export const SnakeGame: React.FC = () => {
+export const SnakeGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const navigate = useNavigate();
     const { updateGameProgress } = useGameStore();
     const gameLogic = useRef<SnakeLogic | null>(null);
@@ -17,7 +17,7 @@ export const SnakeGame: React.FC = () => {
         setUiState({ score: 0, state: 'paused', level: 1 });
 
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (!gameLogic.current) return;
+            if (!gameLogic.current || paused) return;
             switch (e.key) {
                 case 'ArrowUp': gameLogic.current.setDirection('UP'); break;
                 case 'ArrowDown': gameLogic.current.setDirection('DOWN'); break;
@@ -27,7 +27,7 @@ export const SnakeGame: React.FC = () => {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    }, [paused]);
 
     const handleUpdate = (deltaTime: number) => {
         if (!gameLogic.current) return;
@@ -95,14 +95,15 @@ export const SnakeGame: React.FC = () => {
     };
 
     const handleDir = (d: Direction) => {
+        if (paused) return;
         gameLogic.current?.setDirection(d);
     };
 
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-            <div style={{ position: 'absolute', top: 5, right: 10, color: 'white', zIndex: 10 }}>Score: {uiState.score} LV: {uiState.level}</div>
+            <div style={{ position: 'absolute', top: 10, left: 10, color: 'white', zIndex: 10, fontFamily: 'monospace' }}>Score: {uiState.score} LV: {uiState.level}</div>
 
-            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} />
+            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} paused={paused} />
 
             {/* D-Pad Overlay for Mobile */}
             <div style={{

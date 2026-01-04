@@ -6,7 +6,7 @@ import { RetroButton } from '../../components/ui/RetroButton';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/useGameStore';
 
-export const SpaceDefenderGame: React.FC = () => {
+export const SpaceDefenderGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const navigate = useNavigate();
     const { updateGameProgress } = useGameStore();
     const gameLogic = useRef<SpaceDefenderLogic | null>(null);
@@ -106,23 +106,31 @@ export const SpaceDefenderGame: React.FC = () => {
         <div
             style={{ position: 'relative', width: '100%', height: '100%' }}
             onTouchStart={(e) => {
+                if (paused) return;
                 gameLogic.current?.startCharge();
                 handleTouchMove(e);
             }}
-            onTouchEnd={() => gameLogic.current?.releaseCharge()}
+            onTouchEnd={() => {
+                if (paused) return;
+                gameLogic.current?.releaseCharge();
+            }}
             onTouchMove={handleTouchMove}
             onMouseDown={(e) => {
+                if (paused) return;
                 gameLogic.current?.startCharge();
                 handleTouchMove(e);
             }}
-            onMouseUp={() => gameLogic.current?.releaseCharge()}
+            onMouseUp={() => {
+                if (paused) return;
+                gameLogic.current?.releaseCharge();
+            }}
             onMouseMove={(e) => {
-                if (e.buttons === 1) handleTouchMove(e);
+                if (!paused && e.buttons === 1) handleTouchMove(e);
             }}
         >
-            <div style={{ position: 'absolute', top: 5, right: 10, color: 'white', zIndex: 10 }}>Score: {uiState.score}</div>
+            <div style={{ position: 'absolute', top: 10, left: 10, color: 'white', zIndex: 10, fontFamily: 'monospace' }}>Score: {uiState.score}</div>
 
-            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} />
+            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} paused={paused} />
 
             {/* HUD */}
             <div style={{ position: 'absolute', bottom: 10, left: 10, color: 'white', opacity: 0.7, pointerEvents: 'none' }}>

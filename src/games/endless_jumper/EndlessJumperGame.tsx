@@ -6,7 +6,7 @@ import { RetroButton } from '../../components/ui/RetroButton';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/useGameStore';
 
-export const EndlessJumperGame: React.FC = () => {
+export const EndlessJumperGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const navigate = useNavigate();
     const { updateGameProgress } = useGameStore();
     const gameLogic = useRef<EndlessJumperLogic | null>(null);
@@ -69,6 +69,7 @@ export const EndlessJumperGame: React.FC = () => {
     };
 
     const handleTouch = (e: React.TouchEvent | React.MouseEvent) => {
+        if (paused) return;
         let clientX;
         if ('touches' in e) clientX = e.touches[0].clientX;
         else clientX = (e as React.MouseEvent).clientX;
@@ -89,9 +90,9 @@ export const EndlessJumperGame: React.FC = () => {
             onTouchStart={handleTouch}
             onTouchEnd={handleStop}
         >
-            <div style={{ position: 'absolute', top: 5, right: 10, color: 'white', zIndex: 10 }}>Score: {uiState.score}</div>
+            <div style={{ position: 'absolute', top: 10, left: 10, color: 'white', zIndex: 10, fontFamily: 'monospace' }}>Score: {uiState.score}</div>
 
-            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} />
+            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} paused={paused} />
 
             <div style={{ position: 'absolute', bottom: 20, width: '100%', display: 'flex', justifyContent: 'space-between', padding: '0 20px', pointerEvents: 'none', opacity: 0.5 }}>
                 <span style={{ color: 'white', fontSize: '2rem' }}>◀ HOLD</span>

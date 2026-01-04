@@ -6,7 +6,7 @@ import { RetroButton } from '../../components/ui/RetroButton';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/useGameStore';
 
-export const SkyNavigatorGame: React.FC = () => {
+export const SkyNavigatorGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const navigate = useNavigate();
     const { updateGameProgress } = useGameStore();
     const gameLogic = useRef<SkyNavigatorLogic | null>(null);
@@ -21,7 +21,7 @@ export const SkyNavigatorGame: React.FC = () => {
     const handleUpdate = (deltaTime: number) => {
         if (!gameLogic.current) return;
 
-        if (isPressing.current) {
+        if (isPressing.current && !paused) {
             gameLogic.current.thrust();
         }
 
@@ -74,7 +74,7 @@ export const SkyNavigatorGame: React.FC = () => {
         ctx.stroke();
     };
 
-    const handleStartPress = () => { isPressing.current = true; };
+    const handleStartPress = () => { if (!paused) isPressing.current = true; };
     const handleEndPress = () => { isPressing.current = false; };
 
     return (
@@ -86,9 +86,9 @@ export const SkyNavigatorGame: React.FC = () => {
             onTouchStart={handleStartPress}
             onTouchEnd={handleEndPress}
         >
-            <div style={{ position: 'absolute', top: 5, right: 10, color: 'white', zIndex: 10 }}>Score: {uiState.score}</div>
+            <div style={{ position: 'absolute', top: 10, left: 10, color: 'white', zIndex: 10, fontFamily: 'monospace' }}>Score: {uiState.score}</div>
 
-            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} />
+            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} paused={paused} />
 
             <div style={{ position: 'absolute', bottom: 20, width: '100%', textAlign: 'center', color: 'white', opacity: 0.8, pointerEvents: 'none' }}>
                 HOLD TO FLY UP
