@@ -11,6 +11,9 @@ import { MemoryMatchGame } from '../games/memory_match/MemoryMatchGame';
 import { WhacAMoleGame } from '../games/whac_a_mole/WhacAMoleGame';
 import { CatchDropGame } from '../games/catch_drop/CatchDropGame';
 
+import { MashGame } from '../games/mash/MashGame';
+import { QuickReflexGame } from '../games/quick_reflex/QuickReflexGame';
+
 export const GameScreen: React.FC = () => {
     const { gameId } = useParams();
     const navigate = useNavigate();
@@ -35,6 +38,10 @@ export const GameScreen: React.FC = () => {
                 return <WhacAMoleGame />;
             case 'catch_drop':
                 return <CatchDropGame />;
+            case 'mash':
+                return <MashGame />;
+            case 'quick_reflex':
+                return <QuickReflexGame />;
             default:
                 return (
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
