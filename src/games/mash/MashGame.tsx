@@ -68,7 +68,7 @@ export const MashGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
             <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} paused={paused} />
 
-            <div style={{ position: 'relative', zIndex: 10, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, zIndex: 10, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ fontSize: '2rem', color: 'white', marginBottom: 20 }}>
                     TIME: {uiState.timeLeft.toFixed(1)}
                 </div>

@@ -62,7 +62,7 @@ export const QuickReflexGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
         >
             <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} paused={paused} />
 
-            <div style={{ position: 'relative', zIndex: 10, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, zIndex: 10, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
                 {uiState.state === 'wait' && <h1 style={{ color: 'white' }}>WAIT...</h1>}
                 {uiState.state === 'go' && <h1 style={{ color: 'white', fontSize: '4rem' }}>GO!!!</h1>}
 
