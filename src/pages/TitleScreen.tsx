@@ -3,10 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { RetroButton } from '../components/ui/RetroButton';
 import { useGameStore } from '../store/useGameStore';
 
+import { translations } from '../locales/translations';
+
 export const TitleScreen: React.FC = () => {
     const navigate = useNavigate();
     const { language } = useGameStore();
 
+    const t = translations[language];
     const titleText = language === 'ja' || language === 'ja-kana'
         ? "まるごと！\nなつかしミニゲーム11"
         : "RETRO GAME\nCOLLECTION 11";
@@ -31,11 +34,11 @@ export const TitleScreen: React.FC = () => {
             </h1>
 
             <RetroButton size="lg" onClick={() => navigate('/menu')}>
-                START
+                {t.ui.start}
             </RetroButton>
 
             <RetroButton variant="secondary" onClick={() => navigate('/settings')}>
-                SETTINGS
+                {t.ui.settings}
             </RetroButton>
         </div>
     );
