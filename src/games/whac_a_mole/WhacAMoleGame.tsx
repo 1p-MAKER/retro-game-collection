@@ -37,7 +37,7 @@ export const WhacAMoleGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
                 setTimeout(() => {
                     if (gameLogic.current) {
                         const nextLevel = gameLogic.current.level + 1;
-                        updateGameProgress('whac_a_mole', nextLevel, gameLogic.current.score); // Check usage in store
+                        updateGameProgress('whac_a_mole', nextLevel, gameLogic.current.score);
 
                         const currentScore = gameLogic.current.score;
                         gameLogic.current.cleanup();

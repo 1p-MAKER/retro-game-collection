@@ -28,7 +28,7 @@ export const CatchDropGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
             });
 
             if (gameLogic.current.gameState === 'gameover') {
-                updateGameProgress('catch_drop', 1, gameLogic.current.score); // Level handling TBD
+                updateGameProgress('catch_drop', 1, gameLogic.current.score);
             }
         }
     };

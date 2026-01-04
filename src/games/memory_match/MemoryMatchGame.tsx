@@ -37,17 +37,16 @@ export const MemoryMatchGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
             });
 
             if (gameLogic.current.gameState === 'cleared') {
-                // Auto next level stub
                 setTimeout(() => {
                     if (gameLogic.current) {
                         const nextLevel = gameLogic.current.level + 1;
-                        updateGameProgress('memorycmatch', nextLevel, gameLogic.current.score);
+                        updateGameProgress('memory_match', nextLevel, gameLogic.current.score);
                         gameLogic.current = new MemoryMatchLogic(soundManager, nextLevel);
                         gameLogic.current.score = uiState.score; // Keep score
                     }
                 }, 2000);
             } else if (gameLogic.current.gameState === 'gameover') {
-                updateGameProgress('memorycmatch', gameLogic.current.level, gameLogic.current.score);
+                updateGameProgress('memory_match', gameLogic.current.level, gameLogic.current.score);
             }
         }
     };
