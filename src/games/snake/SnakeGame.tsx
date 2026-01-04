@@ -12,6 +12,11 @@ export const SnakeGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const gameLogic = useRef<SnakeLogic | null>(null);
     const [uiState, setUiState] = useState({ score: 0, state: 'paused', level: 1 });
 
+    const headSprite = useRef<HTMLImageElement | null>(null);
+    const bodySprite = useRef<HTMLImageElement | null>(null);
+    const foodSprite = useRef<HTMLImageElement | null>(null);
+    const bgSprite = useRef<HTMLImageElement | null>(null);
+
     useEffect(() => {
         gameLogic.current = new SnakeLogic(soundManager, 1);
         setUiState({ score: 0, state: 'paused', level: 1 });
@@ -27,7 +32,16 @@ export const SnakeGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
     }, [paused]);
+
+    useEffect(() => {
+        const h = new Image(); h.src = '/sprites/snake_head.png'; h.onload = () => headSprite.current = h;
+        const b = new Image(); b.src = '/sprites/snake_body.png'; b.onload = () => bodySprite.current = b;
+        const f = new Image(); f.src = '/sprites/snake_food.png'; f.onload = () => foodSprite.current = f;
+        const bg = new Image(); bg.src = '/sprites/snake_bg.png'; bg.onload = () => bgSprite.current = bg;
+    }, []);
 
     const handleUpdate = (deltaTime: number) => {
         if (!gameLogic.current) return;
@@ -61,35 +75,70 @@ export const SnakeGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
         const g = gameLogic.current;
 
         // BG
-        ctx.fillStyle = '#1D2B53';
-        ctx.fillRect(0, 0, 320, 480);
+        if (bgSprite.current) {
+            const ptrn = ctx.createPattern(bgSprite.current, 'repeat');
+            if (ptrn) {
+                ctx.fillStyle = ptrn;
+                ctx.fillRect(0, 0, 320, 480);
+            } else {
+                ctx.fillStyle = '#008751';
+                ctx.fillRect(0, 0, 320, 480);
+            }
+        } else {
+            ctx.fillStyle = '#1D2B53'; // Fallback
+            ctx.fillRect(0, 0, 320, 480);
+        }
 
         const CELL = 20;
 
         // Walls
         ctx.fillStyle = '#AB5236';
-        g['walls'].forEach(w => { // Access private/protected via bracket if needed or make public
+        g['walls'].forEach(w => {
+            // Can add wall texture later if needed
             ctx.fillRect(w.x * CELL, w.y * CELL, CELL, CELL);
-            // Brick pattern detail
             ctx.strokeStyle = '#000';
             ctx.strokeRect(w.x * CELL, w.y * CELL, CELL, CELL);
         });
 
         // Food
-        ctx.fillStyle = '#FF004D';
-        ctx.beginPath();
-        ctx.arc(g.food.x * CELL + CELL / 2, g.food.y * CELL + CELL / 2, CELL / 3, 0, Math.PI * 2);
-        ctx.fill();
+        if (foodSprite.current) {
+            ctx.drawImage(foodSprite.current, g.food.x * CELL, g.food.y * CELL, CELL, CELL);
+        } else {
+            ctx.fillStyle = '#FF004D';
+            ctx.beginPath();
+            ctx.arc(g.food.x * CELL + CELL / 2, g.food.y * CELL + CELL / 2, CELL / 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
         // Snake
         g.snake.forEach((s, i) => {
-            ctx.fillStyle = i === 0 ? '#00E436' : '#008751';
-            ctx.fillRect(s.x * CELL, s.y * CELL, CELL, CELL);
-            if (i === 0) {
-                // Eyes
-                ctx.fillStyle = '#000';
-                ctx.fillRect(s.x * CELL + 4, s.y * CELL + 4, 2, 2);
-                ctx.fillRect(s.x * CELL + 14, s.y * CELL + 4, 2, 2);
+            if (i === 0 && headSprite.current) {
+                // Head
+                ctx.save();
+                ctx.translate(s.x * CELL + CELL / 2, s.y * CELL + CELL / 2);
+                // Rotate based on direction
+                let angle = 0;
+                switch (g.direction) {
+                    case 'UP': angle = -Math.PI / 2; break;
+                    case 'DOWN': angle = Math.PI / 2; break;
+                    case 'LEFT': angle = Math.PI; break;
+                    case 'RIGHT': angle = 0; break;
+                }
+                ctx.rotate(angle);
+                // Draw image centered
+                // Assuming sprite faces RIGHT by default as per prompt
+                ctx.drawImage(headSprite.current, -CELL / 2, -CELL / 2, CELL, CELL);
+                ctx.restore();
+            } else if (i > 0 && bodySprite.current) {
+                ctx.drawImage(bodySprite.current, s.x * CELL, s.y * CELL, CELL, CELL);
+            } else {
+                ctx.fillStyle = i === 0 ? '#00E436' : '#008751';
+                ctx.fillRect(s.x * CELL, s.y * CELL, CELL, CELL);
+                if (i === 0) {
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(s.x * CELL + 4, s.y * CELL + 4, 2, 2);
+                    ctx.fillRect(s.x * CELL + 14, s.y * CELL + 4, 2, 2);
+                }
             }
         });
     };
