@@ -7,6 +7,9 @@ import { SkyNavigatorGame } from '../games/sky_navigator/SkyNavigatorGame';
 import { LaneRaceGame } from '../games/lane_race/LaneRaceGame';
 import { SpaceDefenderGame } from '../games/space_defender/SpaceDefenderGame';
 import { EndlessJumperGame } from '../games/endless_jumper/EndlessJumperGame';
+import { MemoryMatchGame } from '../games/memory_match/MemoryMatchGame';
+import { WhacAMoleGame } from '../games/whac_a_mole/WhacAMoleGame';
+import { CatchDropGame } from '../games/catch_drop/CatchDropGame';
 
 export const GameScreen: React.FC = () => {
     const { gameId } = useParams();
@@ -26,6 +29,12 @@ export const GameScreen: React.FC = () => {
                 return <SpaceDefenderGame />;
             case 'endless_jumper':
                 return <EndlessJumperGame />;
+            case 'memory_match':
+                return <MemoryMatchGame />;
+            case 'whac_a_mole':
+                return <WhacAMoleGame />;
+            case 'catch_drop':
+                return <CatchDropGame />;
             default:
                 return (
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
