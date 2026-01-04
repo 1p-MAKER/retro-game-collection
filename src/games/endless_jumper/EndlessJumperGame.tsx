@@ -13,9 +13,15 @@ export const EndlessJumperGame: React.FC<{ paused?: boolean }> = ({ paused }) =>
     const [uiState, setUiState] = useState({ score: 0, state: 'paused' });
     const moveDir = useRef<'LEFT' | 'RIGHT' | null>(null);
 
+    const jumperSprite = useRef<HTMLImageElement | null>(null);
+
     useEffect(() => {
         gameLogic.current = new EndlessJumperLogic(soundManager);
         setUiState({ score: 0, state: 'paused' });
+
+        const jumper = new Image();
+        jumper.src = '/sprites/jumper.png';
+        jumper.onload = () => jumperSprite.current = jumper;
     }, []);
 
     const handleUpdate = (deltaTime: number) => {
@@ -58,12 +64,16 @@ export const EndlessJumperGame: React.FC<{ paused?: boolean }> = ({ paused }) =>
         });
 
         // Player
-        ctx.fillStyle = '#00E436';
-        ctx.fillRect(g.x - 10, g.y - 10, 20, 20);
-        // Face
-        ctx.fillStyle = '#000';
-        ctx.fillRect(g.x - 4, g.y - 4, 3, 3);
-        ctx.fillRect(g.x + 2, g.y - 4, 3, 3);
+        if (jumperSprite.current) {
+            ctx.drawImage(jumperSprite.current, g.x - 12, g.y - 12, 24, 24);
+        } else {
+            ctx.fillStyle = '#00E436';
+            ctx.fillRect(g.x - 10, g.y - 10, 20, 20);
+            // Face
+            ctx.fillStyle = '#000';
+            ctx.fillRect(g.x - 4, g.y - 4, 3, 3);
+            ctx.fillRect(g.x + 2, g.y - 4, 3, 3);
+        }
 
         ctx.restore();
     };

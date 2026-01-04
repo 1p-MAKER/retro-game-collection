@@ -12,9 +12,20 @@ export const SpaceDefenderGame: React.FC<{ paused?: boolean }> = ({ paused }) =>
     const gameLogic = useRef<SpaceDefenderLogic | null>(null);
     const [uiState, setUiState] = useState({ score: 0, state: 'paused' });
 
+    const shipSprite = useRef<HTMLImageElement | null>(null);
+    const alienSprite = useRef<HTMLImageElement | null>(null);
+
     useEffect(() => {
         gameLogic.current = new SpaceDefenderLogic(soundManager, 1);
         setUiState({ score: 0, state: 'paused' });
+
+        const ship = new Image();
+        ship.src = '/sprites/ship.png';
+        ship.onload = () => shipSprite.current = ship;
+
+        const alien = new Image();
+        alien.src = '/sprites/alien.png';
+        alien.onload = () => alienSprite.current = alien;
     }, []);
 
     const handleUpdate = (deltaTime: number) => {
@@ -59,14 +70,20 @@ export const SpaceDefenderGame: React.FC<{ paused?: boolean }> = ({ paused }) =>
         for (let i = 0; i < 20; i++) ctx.fillRect((i * 37) % 320, (i * 91) % 480, 2, 2);
 
         // Player Ship
-        ctx.fillStyle = '#29ADFF';
-        ctx.beginPath();
         const sx = g.x;
         const sy = 420;
-        ctx.moveTo(sx, sy - 15);
-        ctx.lineTo(sx - 15, sy + 10);
-        ctx.lineTo(sx + 15, sy + 10);
-        ctx.fill();
+        if (shipSprite.current) {
+            // Draw Sprite
+            ctx.drawImage(shipSprite.current, sx - 20, sy - 20, 40, 40);
+        } else {
+            // Fallback
+            ctx.fillStyle = '#29ADFF';
+            ctx.beginPath();
+            ctx.moveTo(sx, sy - 15);
+            ctx.lineTo(sx - 15, sy + 10);
+            ctx.lineTo(sx + 15, sy + 10);
+            ctx.fill();
+        }
 
         // Player Bullets
         g.bullets.forEach(b => {
@@ -78,12 +95,16 @@ export const SpaceDefenderGame: React.FC<{ paused?: boolean }> = ({ paused }) =>
         // Enemies
         g.enemies.forEach(e => {
             if (!e.active) return;
-            ctx.fillStyle = '#FF004D';
-            // Invader shape placeholder
-            ctx.fillRect(e.x - 10, e.y - 10, 20, 20);
-            ctx.fillStyle = '#FFF';
-            ctx.fillRect(e.x - 5, e.y - 5, 4, 4);
-            ctx.fillRect(e.x + 1, e.y - 5, 4, 4);
+            if (alienSprite.current) {
+                ctx.drawImage(alienSprite.current, e.x - 12, e.y - 12, 24, 24);
+            } else {
+                ctx.fillStyle = '#FF004D';
+                // Invader shape placeholder
+                ctx.fillRect(e.x - 10, e.y - 10, 20, 20);
+                ctx.fillStyle = '#FFF';
+                ctx.fillRect(e.x - 5, e.y - 5, 4, 4);
+                ctx.fillRect(e.x + 1, e.y - 5, 4, 4);
+            }
         });
 
         // Enemy Bullets
