@@ -1,68 +1,76 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* PICO-8 Color Palette */
+  --color-black: #000000;
+  --color-dark-blue: #1D2B53;
+  --color-dark-purple: #7E2553;
+  --color-dark-green: #008751;
+  --color-brown: #AB5236;
+  --color-dark-gray: #5F574F;
+  --color-light-gray: #C2C3C7;
+  --color-white: #FFF1E8;
+  --color-red: #FF004D;
+  --color-orange: #FFA300;
+  --color-yellow: #FFEC27;
+  --color-green: #00E436;
+  --color-blue: #29ADFF;
+  --color-indigo: #83769C;
+  --color-pink: #FF77A8;
+  --color-peach: #FFCCAA;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* App Specific */
+  --font-main: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --app-bg: var(--color-black);
+  --text-main: var(--color-light-gray);
+  --text-highlight: var(--color-white);
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+* {
+  box-sizing: border-box;
+  user-select: none; /* ゲーム向けにテキスト選択を無効化 */
+  -webkit-touch-callout: none;
 }
 
 body {
   margin: 0;
+  padding: 0;
+  background-color: var(--app-bg);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  overscroll-behavior: none; /* スマホでのバウンススクロール防止 */
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+/* Pixel Art Image Rendering */
+canvas {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Scrollbar customization (optional) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-dark-blue);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-indigo);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-light-gray);
 }
