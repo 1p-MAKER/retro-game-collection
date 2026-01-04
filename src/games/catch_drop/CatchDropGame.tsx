@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { CatchDropLogic } from './CatchDropLogic';
 import { soundManager } from '../../audio/SoundGenerator';
+import { loadTransparentSprite } from '../../utils/imageProcessing';
 import { RetroButton } from '../../components/ui/RetroButton';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/useGameStore';
@@ -12,21 +13,31 @@ export const CatchDropGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const gameLogic = useRef<CatchDropLogic | null>(null);
     const [uiState, setUiState] = useState({ score: 0, state: 'paused' });
 
-    const bucketSprite = useRef<HTMLImageElement | null>(null);
-    const fruitSprite = useRef<HTMLImageElement | null>(null);
-    const gemSprite = useRef<HTMLImageElement | null>(null);
-    const bombSprite = useRef<HTMLImageElement | null>(null);
-    const bgSprite = useRef<HTMLImageElement | null>(null);
+    const bucketSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
+    const fruitSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
+    const gemSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
+    const bombSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
+    const bgSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
 
     useEffect(() => {
         gameLogic.current = new CatchDropLogic(soundManager, 1);
         setUiState({ score: 0, state: 'playing' });
 
-        const bu = new Image(); bu.src = '/sprites/catch_bucket.png'; bu.onload = () => bucketSprite.current = bu;
-        const fr = new Image(); fr.src = '/sprites/catch_fruit.png'; fr.onload = () => fruitSprite.current = fr;
-        const ge = new Image(); ge.src = '/sprites/catch_gem.png'; ge.onload = () => gemSprite.current = ge;
-        const bo = new Image(); bo.src = '/sprites/catch_bomb.png'; bo.onload = () => bombSprite.current = bo;
-        const bg = new Image(); bg.src = '/sprites/catch_bg.png'; bg.onload = () => bgSprite.current = bg;
+        const load = async () => {
+            bucketSprite.current = await loadTransparentSprite('/sprites/catch_bucket.png');
+            fruitSprite.current = await loadTransparentSprite('/sprites/catch_fruit.png');
+            gemSprite.current = await loadTransparentSprite('/sprites/catch_gem.png');
+            bombSprite.current = await loadTransparentSprite('/sprites/catch_bomb.png');
+            // BG doesn't need transparency usually, but let's keep it consistent or just load normal
+            // Actually BG should NOT have transparency removed usually if it fills screen, 
+            // but our function detects topLeft. BG topLeft might be sky blue.
+            // If we make sky blue transparent, we see black canvas.
+            // So for BG, normal load is standard.
+            const bg = new Image();
+            bg.src = '/sprites/catch_bg.png';
+            bg.onload = () => bgSprite.current = bg;
+        };
+        load();
     }, []);
 
     const handleUpdate = (deltaTime: number) => {

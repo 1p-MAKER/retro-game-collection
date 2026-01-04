@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { GameCanvas } from '../../components/layout/GameCanvas';
 import { BreakoutLogic } from './BreakoutLogic';
 import { soundManager } from '../../audio/SoundGenerator';
+import { loadTransparentSprite } from '../../utils/imageProcessing';
 import { RetroButton } from '../../components/ui/RetroButton';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/useGameStore';
@@ -13,10 +14,10 @@ export const BreakoutGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     // Forces re-render for UI updates (score, lives) - not for 60fps canvas
     const [uiState, setUiState] = useState({ score: 0, lives: 3, level: 1, state: 'paused' });
 
-    const paddleSprite = useRef<HTMLImageElement | null>(null);
-    const ballSprite = useRef<HTMLImageElement | null>(null);
-    const brickSprite = useRef<HTMLImageElement | null>(null);
-    const bgSprite = useRef<HTMLImageElement | null>(null);
+    const paddleSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
+    const ballSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
+    const brickSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
+    const bgSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
 
     useEffect(() => {
         // Init Logic
@@ -30,10 +31,16 @@ export const BreakoutGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     }, []);
 
     useEffect(() => {
-        const p = new Image(); p.src = '/sprites/breakout_paddle.png'; p.onload = () => paddleSprite.current = p;
-        const b = new Image(); b.src = '/sprites/breakout_ball.png'; b.onload = () => ballSprite.current = b;
-        const br = new Image(); br.src = '/sprites/breakout_brick.png'; br.onload = () => brickSprite.current = br;
-        const bg = new Image(); bg.src = '/sprites/breakout_bg.png'; bg.onload = () => bgSprite.current = bg;
+        const load = async () => {
+            paddleSprite.current = await loadTransparentSprite('/sprites/breakout_paddle.png');
+            ballSprite.current = await loadTransparentSprite('/sprites/breakout_ball.png');
+            brickSprite.current = await loadTransparentSprite('/sprites/breakout_brick.png');
+
+            const bg = new Image();
+            bg.src = '/sprites/breakout_bg.png';
+            bg.onload = () => bgSprite.current = bg;
+        };
+        load();
     }, []);
 
     const handleUpdate = (deltaTime: number) => {

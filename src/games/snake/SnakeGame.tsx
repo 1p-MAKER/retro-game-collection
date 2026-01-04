@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { GameCanvas } from '../../components/layout/GameCanvas';
 import { SnakeLogic, type Direction } from './SnakeLogic';
 import { soundManager } from '../../audio/SoundGenerator';
+import { loadTransparentSprite } from '../../utils/imageProcessing';
 import { RetroButton } from '../../components/ui/RetroButton';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/useGameStore';
@@ -12,10 +13,10 @@ export const SnakeGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const gameLogic = useRef<SnakeLogic | null>(null);
     const [uiState, setUiState] = useState({ score: 0, state: 'paused', level: 1 });
 
-    const headSprite = useRef<HTMLImageElement | null>(null);
-    const bodySprite = useRef<HTMLImageElement | null>(null);
-    const foodSprite = useRef<HTMLImageElement | null>(null);
-    const bgSprite = useRef<HTMLImageElement | null>(null);
+    const headSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
+    const bodySprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
+    const foodSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
+    const bgSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
 
     useEffect(() => {
         gameLogic.current = new SnakeLogic(soundManager, 1);
@@ -37,10 +38,16 @@ export const SnakeGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     }, [paused]);
 
     useEffect(() => {
-        const h = new Image(); h.src = '/sprites/snake_head.png'; h.onload = () => headSprite.current = h;
-        const b = new Image(); b.src = '/sprites/snake_body.png'; b.onload = () => bodySprite.current = b;
-        const f = new Image(); f.src = '/sprites/snake_food.png'; f.onload = () => foodSprite.current = f;
-        const bg = new Image(); bg.src = '/sprites/snake_bg.png'; bg.onload = () => bgSprite.current = bg;
+        const load = async () => {
+            headSprite.current = await loadTransparentSprite('/sprites/snake_head.png');
+            bodySprite.current = await loadTransparentSprite('/sprites/snake_body.png');
+            foodSprite.current = await loadTransparentSprite('/sprites/snake_food.png');
+
+            const bg = new Image();
+            bg.src = '/sprites/snake_bg.png';
+            bg.onload = () => bgSprite.current = bg;
+        };
+        load();
     }, []);
 
     const handleUpdate = (deltaTime: number) => {

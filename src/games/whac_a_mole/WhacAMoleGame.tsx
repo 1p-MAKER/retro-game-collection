@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { WhacAMoleLogic } from './WhacAMoleLogic';
 import { soundManager } from '../../audio/SoundGenerator';
+import { loadTransparentSprite } from '../../utils/imageProcessing';
 import { RetroButton } from '../../components/ui/RetroButton';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/useGameStore';
@@ -12,19 +13,25 @@ export const WhacAMoleGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const gameLogic = useRef<WhacAMoleLogic | null>(null);
     const [uiState, setUiState] = useState({ score: 0, state: 'paused', timeLeft: 30 });
 
-    const moleSprite = useRef<HTMLImageElement | null>(null);
-    const bombSprite = useRef<HTMLImageElement | null>(null);
-    const holeSprite = useRef<HTMLImageElement | null>(null);
-    const bgSprite = useRef<HTMLImageElement | null>(null);
+    const moleSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
+    const bombSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
+    const holeSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
+    const bgSprite = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
 
     useEffect(() => {
         gameLogic.current = new WhacAMoleLogic(soundManager, 1);
         setUiState({ score: 0, state: 'playing', timeLeft: 30 });
 
-        const m = new Image(); m.src = '/sprites/mole_mole.png'; m.onload = () => moleSprite.current = m;
-        const b = new Image(); b.src = '/sprites/mole_bomb.png'; b.onload = () => bombSprite.current = b;
-        const h = new Image(); h.src = '/sprites/mole_hole.png'; h.onload = () => holeSprite.current = h;
-        const bg = new Image(); bg.src = '/sprites/mole_bg.png'; bg.onload = () => bgSprite.current = bg;
+        const load = async () => {
+            moleSprite.current = await loadTransparentSprite('/sprites/mole_mole.png');
+            bombSprite.current = await loadTransparentSprite('/sprites/mole_bomb.png');
+            holeSprite.current = await loadTransparentSprite('/sprites/mole_hole.png');
+
+            const bg = new Image();
+            bg.src = '/sprites/mole_bg.png';
+            bg.onload = () => bgSprite.current = bg;
+        };
+        load();
 
         return () => gameLogic.current?.cleanup();
     }, []);
