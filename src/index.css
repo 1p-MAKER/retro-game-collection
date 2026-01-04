@@ -23,8 +23,8 @@
   --text-main: var(--color-light-gray);
   --text-highlight: var(--color-white);
 
-  --safe-top: env(safe-area-inset-top, 20px);
-  --safe-bottom: env(safe-area-inset-bottom, 20px);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 * {

@@ -59,12 +59,13 @@ export const GameScreen: React.FC = () => {
 
     return (
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-            {/* Top Bar (Score/Time usually here, but avoiding overlap via padding) */}
+            {/* Safe Area Spacer */}
             <div style={{
                 height: 'var(--safe-top)',
                 width: '100%',
-                backgroundColor: 'rgba(0,0,0,0.2)', // Slight dim to show safe area
-                zIndex: 50
+                backgroundColor: 'rgba(0,0,0,0.2)',
+                zIndex: 50,
+                flexShrink: 0 // Prevent collapsing
             }} />
 
             <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
@@ -77,12 +78,19 @@ export const GameScreen: React.FC = () => {
                         position: 'absolute',
                         top: '10px',
                         right: '10px',
-                        zIndex: 90,
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        color: 'rgba(255, 255, 255, 0.5)',
-                        fontSize: '24px',
-                        cursor: 'pointer'
+                        zIndex: 999, // High z-index to stay on top
+                        backgroundColor: 'rgba(0,0,0,0.5)', // Visible background
+                        border: '2px solid rgba(255,255,255,0.3)',
+                        borderRadius: '50%',
+                        color: 'white',
+                        width: '44px', // Standard touch target size
+                        height: '44px',
+                        fontSize: '20px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        pointerEvents: 'auto'
                     }}
                 >
                     ⏸
