@@ -12,9 +12,21 @@ export const CatchDropGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const gameLogic = useRef<CatchDropLogic | null>(null);
     const [uiState, setUiState] = useState({ score: 0, state: 'paused' });
 
+    const bucketSprite = useRef<HTMLImageElement | null>(null);
+    const fruitSprite = useRef<HTMLImageElement | null>(null);
+    const gemSprite = useRef<HTMLImageElement | null>(null);
+    const bombSprite = useRef<HTMLImageElement | null>(null);
+    const bgSprite = useRef<HTMLImageElement | null>(null);
+
     useEffect(() => {
         gameLogic.current = new CatchDropLogic(soundManager, 1);
         setUiState({ score: 0, state: 'playing' });
+
+        const bu = new Image(); bu.src = '/sprites/catch_bucket.png'; bu.onload = () => bucketSprite.current = bu;
+        const fr = new Image(); fr.src = '/sprites/catch_fruit.png'; fr.onload = () => fruitSprite.current = fr;
+        const ge = new Image(); ge.src = '/sprites/catch_gem.png'; ge.onload = () => gemSprite.current = ge;
+        const bo = new Image(); bo.src = '/sprites/catch_bomb.png'; bo.onload = () => bombSprite.current = bo;
+        const bg = new Image(); bg.src = '/sprites/catch_bg.png'; bg.onload = () => bgSprite.current = bg;
     }, []);
 
     const handleUpdate = (deltaTime: number) => {
@@ -38,48 +50,69 @@ export const CatchDropGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
         const g = gameLogic.current;
 
         // Sky BG
-        ctx.fillStyle = '#29ADFF';
-        ctx.fillRect(0, 0, 320, 480);
+        if (bgSprite.current) {
+            ctx.drawImage(bgSprite.current, 0, 0, 320, 480);
+        } else {
+            ctx.fillStyle = '#29ADFF';
+            ctx.fillRect(0, 0, 320, 480);
+        }
 
         // Bucket
-        ctx.fillStyle = '#83769C';
-        ctx.beginPath();
         const bx = g.x;
-        const by = 400;
-        ctx.moveTo(bx - 30, by - 20);
-        ctx.lineTo(bx + 30, by - 20);
-        ctx.lineTo(bx + 20, by + 20);
-        ctx.lineTo(bx - 20, by + 20);
-        ctx.fill();
+        const by = 400; // Fixed Y pos from original code
+
+        if (bucketSprite.current) {
+            ctx.drawImage(bucketSprite.current, bx - 30, by - 20, 60, 40);
+        } else {
+            ctx.fillStyle = '#83769C';
+            ctx.beginPath();
+            ctx.moveTo(bx - 30, by - 20);
+            ctx.lineTo(bx + 30, by - 20);
+            ctx.lineTo(bx + 20, by + 20);
+            ctx.lineTo(bx - 20, by + 20);
+            ctx.fill();
+        }
 
         // Items
         g.items.forEach(item => {
             if (!item.active) return;
-            if (item.type === 'bomb') {
-                ctx.fillStyle = '#1D2B53';
-                ctx.beginPath();
-                ctx.arc(item.x, item.y, 15, 0, Math.PI * 2);
-                ctx.fill();
-                // Fuse
-                ctx.strokeStyle = '#FFEC27';
-                ctx.beginPath();
-                ctx.moveTo(item.x, item.y - 15);
-                ctx.lineTo(item.x + 5, item.y - 25);
-                ctx.stroke();
-            } else if (item.type === 'gem') {
-                ctx.fillStyle = '#FFCCAA'; // Shine
-                ctx.beginPath();
-                ctx.moveTo(item.x, item.y - 15);
-                ctx.lineTo(item.x + 15, item.y);
-                ctx.lineTo(item.x, item.y + 15);
-                ctx.lineTo(item.x - 15, item.y);
-                ctx.fill();
+
+            let sprite = null;
+            if (item.type === 'bomb') sprite = bombSprite.current;
+            else if (item.type === 'gem') sprite = gemSprite.current;
+            else sprite = fruitSprite.current;
+
+            if (sprite) {
+                // Draw sprite centered at item.x, item.y
+                // Items have roughly 15 radius -> 30x30 size
+                ctx.drawImage(sprite, item.x - 15, item.y - 15, 30, 30);
             } else {
-                // Apple
-                ctx.fillStyle = '#FF004D';
-                ctx.beginPath();
-                ctx.arc(item.x, item.y, 15, 0, Math.PI * 2);
-                ctx.fill();
+                if (item.type === 'bomb') {
+                    ctx.fillStyle = '#1D2B53';
+                    ctx.beginPath();
+                    ctx.arc(item.x, item.y, 15, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Fuse
+                    ctx.strokeStyle = '#FFEC27';
+                    ctx.beginPath();
+                    ctx.moveTo(item.x, item.y - 15);
+                    ctx.lineTo(item.x + 5, item.y - 25);
+                    ctx.stroke();
+                } else if (item.type === 'gem') {
+                    ctx.fillStyle = '#FFCCAA'; // Shine
+                    ctx.beginPath();
+                    ctx.moveTo(item.x, item.y - 15);
+                    ctx.lineTo(item.x + 15, item.y);
+                    ctx.lineTo(item.x, item.y + 15);
+                    ctx.lineTo(item.x - 15, item.y);
+                    ctx.fill();
+                } else {
+                    // Apple
+                    ctx.fillStyle = '#FF004D';
+                    ctx.beginPath();
+                    ctx.arc(item.x, item.y, 15, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
         });
     };
