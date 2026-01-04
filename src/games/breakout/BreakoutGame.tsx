@@ -13,6 +13,11 @@ export const BreakoutGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     // Forces re-render for UI updates (score, lives) - not for 60fps canvas
     const [uiState, setUiState] = useState({ score: 0, lives: 3, level: 1, state: 'paused' });
 
+    const paddleSprite = useRef<HTMLImageElement | null>(null);
+    const ballSprite = useRef<HTMLImageElement | null>(null);
+    const brickSprite = useRef<HTMLImageElement | null>(null);
+    const bgSprite = useRef<HTMLImageElement | null>(null);
+
     useEffect(() => {
         // Init Logic
         gameLogic.current = new BreakoutLogic(soundManager, 1);
@@ -22,6 +27,13 @@ export const BreakoutGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
             level: gameLogic.current.level,
             state: gameLogic.current.gameState
         });
+    }, []);
+
+    useEffect(() => {
+        const p = new Image(); p.src = '/sprites/breakout_paddle.png'; p.onload = () => paddleSprite.current = p;
+        const b = new Image(); b.src = '/sprites/breakout_ball.png'; b.onload = () => ballSprite.current = b;
+        const br = new Image(); br.src = '/sprites/breakout_brick.png'; br.onload = () => brickSprite.current = br;
+        const bg = new Image(); bg.src = '/sprites/breakout_bg.png'; bg.onload = () => bgSprite.current = bg;
     }, []);
 
     const handleUpdate = (deltaTime: number) => {
@@ -64,24 +76,47 @@ export const BreakoutGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
         const game = gameLogic.current;
 
         // Background
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, 320, 480);
+        if (bgSprite.current) {
+            ctx.drawImage(bgSprite.current, 0, 0, 320, 480);
+        } else {
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, 320, 480);
+        }
 
         // Paddle
-        ctx.fillStyle = '#29ADFF';
-        ctx.fillRect(game.paddle.x, 480 - 30, game.paddle.width, game.paddle.height);
+        if (paddleSprite.current) {
+            ctx.drawImage(paddleSprite.current, game.paddle.x, 480 - 30, game.paddle.width, game.paddle.height);
+        } else {
+            ctx.fillStyle = '#29ADFF';
+            ctx.fillRect(game.paddle.x, 480 - 30, game.paddle.width, game.paddle.height);
+        }
 
         // Ball
-        ctx.fillStyle = '#FFF1E8';
-        ctx.beginPath();
-        ctx.arc(game.ball.x, game.ball.y, 4, 0, Math.PI * 2);
-        ctx.fill();
+        if (ballSprite.current) {
+            // Ball radius is 4, diameter 8. Sprite might be larger, let's scale to slightly larger than hitbox for effect
+            ctx.drawImage(ballSprite.current, game.ball.x - 6, game.ball.y - 6, 12, 12);
+        } else {
+            ctx.fillStyle = '#FFF1E8';
+            ctx.beginPath();
+            ctx.arc(game.ball.x, game.ball.y, 4, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
+        // Blocks
         // Blocks
         for (const block of game.blocks) {
             if (block.active) {
-                ctx.fillStyle = block.color;
-                ctx.fillRect(block.x, block.y, block.width, block.height);
+                if (brickSprite.current) {
+                    ctx.fillStyle = block.color;
+                    ctx.fillRect(block.x, block.y, block.width, block.height);
+
+                    ctx.globalAlpha = 0.5;
+                    ctx.drawImage(brickSprite.current, block.x, block.y, block.width, block.height);
+                    ctx.globalAlpha = 1.0;
+                } else {
+                    ctx.fillStyle = block.color;
+                    ctx.fillRect(block.x, block.y, block.width, block.height);
+                }
 
                 // Hard block indicator
                 if (block.type === 'hard' && block.hp > 1) {
@@ -147,7 +182,6 @@ export const BreakoutGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
                     paused={paused}
                 />
             </div>
-
             {/* Lives Indicator */}
             <div style={{
                 position: 'absolute', bottom: 10, left: 10,
