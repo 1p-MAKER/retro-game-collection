@@ -12,9 +12,20 @@ export const WhacAMoleGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const gameLogic = useRef<WhacAMoleLogic | null>(null);
     const [uiState, setUiState] = useState({ score: 0, state: 'paused', timeLeft: 30 });
 
+    const moleSprite = useRef<HTMLImageElement | null>(null);
+    const bombSprite = useRef<HTMLImageElement | null>(null);
+    const holeSprite = useRef<HTMLImageElement | null>(null);
+    const bgSprite = useRef<HTMLImageElement | null>(null);
+
     useEffect(() => {
         gameLogic.current = new WhacAMoleLogic(soundManager, 1);
         setUiState({ score: 0, state: 'playing', timeLeft: 30 });
+
+        const m = new Image(); m.src = '/sprites/mole_mole.png'; m.onload = () => moleSprite.current = m;
+        const b = new Image(); b.src = '/sprites/mole_bomb.png'; b.onload = () => bombSprite.current = b;
+        const h = new Image(); h.src = '/sprites/mole_hole.png'; h.onload = () => holeSprite.current = h;
+        const bg = new Image(); bg.src = '/sprites/mole_bg.png'; bg.onload = () => bgSprite.current = bg;
+
         return () => gameLogic.current?.cleanup();
     }, []);
 
@@ -56,8 +67,12 @@ export const WhacAMoleGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
         const g = gameLogic.current;
 
         // Grass BG
-        ctx.fillStyle = '#00E436';
-        ctx.fillRect(0, 0, 320, 480);
+        if (bgSprite.current) {
+            ctx.drawImage(bgSprite.current, 0, 0, 320, 480);
+        } else {
+            ctx.fillStyle = '#00E436';
+            ctx.fillRect(0, 0, 320, 480);
+        }
 
         // Holes
         const COLS = 3;
@@ -73,30 +88,44 @@ export const WhacAMoleGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
             const y = START_Y + row * (SIZE + GAP);
 
             // Hole
-            ctx.fillStyle = '#1D2B53';
-            ctx.beginPath();
-            ctx.ellipse(x + SIZE / 2, y + SIZE - 10, SIZE / 2 - 5, SIZE / 4, 0, 0, Math.PI * 2);
-            ctx.fill();
+            if (holeSprite.current) {
+                // Draw hole slightly flattened or as is. Sprite is oval checked
+                ctx.drawImage(holeSprite.current, x, y + SIZE / 2, SIZE, SIZE / 2);
+            } else {
+                ctx.fillStyle = '#1D2B53';
+                ctx.beginPath();
+                ctx.ellipse(x + SIZE / 2, y + SIZE - 10, SIZE / 2 - 5, SIZE / 4, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
 
             if (['up', 'hit', 'miss'].includes(m.state)) {
                 const isBomb = m.type === 'bomb';
-                const color = isBomb ? '#FF004D' : '#AB5236';
 
-                // Mole/Bomb Body
-                ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.arc(x + SIZE / 2, y + SIZE / 2 + 10, 30, Math.PI, 0); // Semicircleish
-                ctx.lineTo(x + SIZE / 2 + 30, y + SIZE / 2 + 30);
-                ctx.lineTo(x + SIZE / 2 - 30, y + SIZE / 2 + 30);
-                ctx.fill();
+                let sprite = isBomb ? bombSprite.current : moleSprite.current;
 
-                // Eyes
-                ctx.fillStyle = '#FFF';
-                ctx.fillRect(x + SIZE / 2 - 15, y + SIZE / 2, 10, 10);
-                ctx.fillRect(x + SIZE / 2 + 5, y + SIZE / 2, 10, 10);
-                ctx.fillStyle = '#000';
-                ctx.fillRect(x + SIZE / 2 - 12, y + SIZE / 2 + 3, 4, 4);
-                ctx.fillRect(x + SIZE / 2 + 8, y + SIZE / 2 + 3, 4, 4);
+                if (sprite) {
+                    // Animate pop up? For now just draw
+                    // Center sprite in hole
+                    const sW = SIZE;
+                    const sH = SIZE;
+                    // Offset Y based on state if we want animation, but logic handles 'up' state.
+                    // We can just draw immediately above hole center
+                    ctx.drawImage(sprite, x, y, sW, sH);
+                } else {
+                    const color = isBomb ? '#FF004D' : '#AB5236';
+                    // Mole/Bomb Body
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x + SIZE / 2, y + SIZE / 2 + 10, 30, Math.PI, 0); // Semicircleish
+                    ctx.lineTo(x + SIZE / 2 + 30, y + SIZE / 2 + 30);
+                    ctx.lineTo(x + SIZE / 2 - 30, y + SIZE / 2 + 30);
+                    ctx.fill();
+
+                    // Eyes (only simple fallback)
+                    ctx.fillStyle = '#FFF';
+                    ctx.fillRect(x + SIZE / 2 - 15, y + SIZE / 2, 10, 10);
+                    ctx.fillRect(x + SIZE / 2 + 5, y + SIZE / 2, 10, 10);
+                }
 
                 // Feedback
                 if (m.state === 'hit') {
@@ -105,9 +134,7 @@ export const WhacAMoleGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
                     ctx.textAlign = 'center';
                     ctx.fillText('HIT!', x + SIZE / 2, y);
                 } else if (m.state === 'miss') {
-                    // This logic is slightly weird in rendering, logic handles state
-                    // If bomb hit -> miss visual
-                    if (isBomb && m.state === 'miss') { // logic sets miss for bomb hit
+                    if (isBomb && m.state === 'miss') {
                         ctx.fillStyle = '#000';
                         ctx.fillText('OUCH!', x + SIZE / 2, y);
                     }
