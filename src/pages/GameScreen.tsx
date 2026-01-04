@@ -4,6 +4,9 @@ import { RetroButton } from '../components/ui/RetroButton';
 import { BreakoutGame } from '../games/breakout/BreakoutGame';
 import { SnakeGame } from '../games/snake/SnakeGame';
 import { SkyNavigatorGame } from '../games/sky_navigator/SkyNavigatorGame';
+import { LaneRaceGame } from '../games/lane_race/LaneRaceGame';
+import { SpaceDefenderGame } from '../games/space_defender/SpaceDefenderGame';
+import { EndlessJumperGame } from '../games/endless_jumper/EndlessJumperGame';
 
 export const GameScreen: React.FC = () => {
     const { gameId } = useParams();
@@ -17,6 +20,12 @@ export const GameScreen: React.FC = () => {
                 return <SnakeGame />;
             case 'sky_navigator':
                 return <SkyNavigatorGame />;
+            case 'lane_race':
+                return <LaneRaceGame />;
+            case 'space_defender':
+                return <SpaceDefenderGame />;
+            case 'endless_jumper':
+                return <EndlessJumperGame />;
             default:
                 return (
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
