@@ -6,6 +6,7 @@ interface GameCanvasProps {
     onUpdate: (deltaTime: number) => void;
     onDraw: (ctx: CanvasRenderingContext2D) => void;
     className?: string;
+    paused?: boolean;
 }
 
 export const GameCanvas: React.FC<GameCanvasProps> = ({
@@ -13,7 +14,8 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     height,
     onUpdate,
     onDraw,
-    className
+    className,
+    paused = false
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const requestRef = useRef<number>(0);
@@ -26,7 +28,9 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
             // Cap deltaTime to avoid huge jumps if tab is inactive
             const cappedDelta = Math.min(deltaTime, 50);
 
-            onUpdate(cappedDelta);
+            if (!paused) {
+                onUpdate(cappedDelta);
+            }
 
             const canvas = canvasRef.current;
             if (canvas) {
@@ -44,7 +48,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     useEffect(() => {
         requestRef.current = requestAnimationFrame(animate);
         return () => cancelAnimationFrame(requestRef.current);
-    }, [onUpdate, onDraw]); // Dependencies might need tuning if logic changes often
+    }, [paused, onUpdate, onDraw]); // Dependencies might need tuning if logic changes often
 
     return (
         <canvas

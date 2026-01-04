@@ -6,7 +6,7 @@ import { RetroButton } from '../../components/ui/RetroButton';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/useGameStore';
 
-export const BreakoutGame: React.FC = () => {
+export const BreakoutGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const navigate = useNavigate();
     const { updateGameProgress } = useGameStore();
     const gameLogic = useRef<BreakoutLogic | null>(null);
@@ -93,7 +93,7 @@ export const BreakoutGame: React.FC = () => {
     };
 
     const handleTouch = (e: React.TouchEvent | React.MouseEvent) => {
-        if (!gameLogic.current) return;
+        if (!gameLogic.current || paused) return;
 
         // Calculate X relative to canvas
         const canvas = e.currentTarget as HTMLCanvasElement;
@@ -129,11 +129,11 @@ export const BreakoutGame: React.FC = () => {
                 onTouchMove={handleTouch}
                 onTouchStart={(e) => {
                     handleTouch(e);
-                    gameLogic.current?.launch();
+                    if (!paused) gameLogic.current?.launch();
                 }}
                 onMouseDown={(e) => {
                     handleTouch(e);
-                    gameLogic.current?.launch();
+                    if (!paused) gameLogic.current?.launch();
                 }}
                 onMouseMove={(e) => {
                     // Check button pressed
@@ -144,6 +144,7 @@ export const BreakoutGame: React.FC = () => {
                     width={320} height={480}
                     onUpdate={handleUpdate}
                     onDraw={handleDraw}
+                    paused={paused}
                 />
             </div>
 

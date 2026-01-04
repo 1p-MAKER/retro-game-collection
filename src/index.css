@@ -22,11 +22,15 @@
   --app-bg: var(--color-black);
   --text-main: var(--color-light-gray);
   --text-highlight: var(--color-white);
+
+  --safe-top: env(safe-area-inset-top, 20px);
+  --safe-bottom: env(safe-area-inset-bottom, 20px);
 }
 
 * {
   box-sizing: border-box;
-  user-select: none; /* ゲーム向けにテキスト選択を無効化 */
+  user-select: none;
+  /* ゲーム向けにテキスト選択を無効化 */
   -webkit-touch-callout: none;
 }
 
@@ -36,7 +40,8 @@ body {
   background-color: var(--app-bg);
   color: var(--text-main);
   font-family: var(--font-main);
-  overscroll-behavior: none; /* スマホでのバウンススクロール防止 */
+  overscroll-behavior: none;
+  /* スマホでのバウンススクロール防止 */
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -64,13 +69,16 @@ canvas {
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--color-dark-blue);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--color-indigo);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-light-gray);
 }

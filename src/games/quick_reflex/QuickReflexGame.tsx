@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/useGameStore';
 import { GameCanvas } from '../../components/layout/GameCanvas';
 
-export const QuickReflexGame: React.FC = () => {
+export const QuickReflexGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const navigate = useNavigate();
     const { updateGameProgress } = useGameStore();
     const gameLogic = useRef<QuickReflexLogic | null>(null);
@@ -50,6 +50,7 @@ export const QuickReflexGame: React.FC = () => {
     };
 
     const handleTap = () => {
+        if (paused) return;
         gameLogic.current?.tap();
     };
 
@@ -59,7 +60,7 @@ export const QuickReflexGame: React.FC = () => {
             onMouseDown={handleTap}
             onTouchStart={handleTap}
         >
-            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} />
+            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} paused={paused} />
 
             <div style={{ position: 'relative', zIndex: 10, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
                 {uiState.state === 'wait' && <h1 style={{ color: 'white' }}>WAIT...</h1>}
