@@ -2,6 +2,8 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { RetroButton } from '../components/ui/RetroButton';
 import { BreakoutGame } from '../games/breakout/BreakoutGame';
+import { SnakeGame } from '../games/snake/SnakeGame';
+import { SkyNavigatorGame } from '../games/sky_navigator/SkyNavigatorGame';
 
 export const GameScreen: React.FC = () => {
     const { gameId } = useParams();
@@ -11,6 +13,10 @@ export const GameScreen: React.FC = () => {
         switch (gameId) {
             case 'breakout':
                 return <BreakoutGame />;
+            case 'snake':
+                return <SnakeGame />;
+            case 'sky_navigator':
+                return <SkyNavigatorGame />;
             default:
                 return (
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
