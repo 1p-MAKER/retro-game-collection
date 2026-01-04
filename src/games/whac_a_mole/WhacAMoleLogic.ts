@@ -14,7 +14,7 @@ export class WhacAMoleLogic {
     public timeLeft: number = 30;
 
     private sound: SoundGenerator;
-    private level: number = 1;
+    public level: number = 1;
     private timerInterval: any = null;
     private spawnTimer: number = 0;
 

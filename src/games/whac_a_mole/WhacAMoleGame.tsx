@@ -8,7 +8,7 @@ import { GameCanvas } from '../../components/layout/GameCanvas';
 
 export const WhacAMoleGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const navigate = useNavigate();
-    const { } = useGameStore();
+    const { updateGameProgress } = useGameStore();
     const gameLogic = useRef<WhacAMoleLogic | null>(null);
     const [uiState, setUiState] = useState({ score: 0, state: 'paused', timeLeft: 30 });
 
@@ -34,7 +34,19 @@ export const WhacAMoleGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
             });
 
             if (gameLogic.current.gameState === 'cleared') {
-                // Next level stub
+                setTimeout(() => {
+                    if (gameLogic.current) {
+                        const nextLevel = gameLogic.current.level + 1;
+                        updateGameProgress('whac_a_mole', nextLevel, gameLogic.current.score); // Check usage in store
+
+                        const currentScore = gameLogic.current.score;
+                        gameLogic.current.cleanup();
+                        gameLogic.current = new WhacAMoleLogic(soundManager, nextLevel);
+                        gameLogic.current.score = currentScore; // Inherit
+
+                        setUiState(prev => ({ ...prev, timeLeft: 30, state: 'playing' })); // Reset time
+                    }
+                }, 2000);
             }
         }
     };

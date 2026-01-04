@@ -28,7 +28,7 @@ export class SpaceDefenderLogic {
     public isCharging: boolean = false;
 
     private sound: SoundGenerator;
-    private level: number = 1;
+    public level: number = 1;
     constructor(sound: SoundGenerator, level: number = 1) {
         this.sound = sound;
         this.level = level;

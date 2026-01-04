@@ -28,8 +28,19 @@ export const SpaceDefenderGame: React.FC<{ paused?: boolean }> = ({ paused }) =>
             });
 
             if (gameLogic.current.gameState === 'cleared') {
-                // Next level logic could go here
-                updateGameProgress('space_defender', 2, gameLogic.current.score); // Stub
+                setTimeout(() => {
+                    if (gameLogic.current) {
+                        const nextLevel = gameLogic.current.level + 1;
+                        updateGameProgress('space_defender', nextLevel, gameLogic.current.score);
+
+                        // Restart with next level
+                        const currentScore = gameLogic.current.score;
+                        gameLogic.current = new SpaceDefenderLogic(soundManager, nextLevel);
+                        gameLogic.current.score = currentScore;
+
+                        setUiState(prev => ({ ...prev, state: 'paused' }));
+                    }
+                }, 2000);
             } else if (gameLogic.current.gameState === 'gameover') {
                 updateGameProgress('space_defender', 1, gameLogic.current.score);
             }
