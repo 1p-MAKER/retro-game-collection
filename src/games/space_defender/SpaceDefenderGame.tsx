@@ -177,9 +177,9 @@ export const SpaceDefenderGame: React.FC<{ paused?: boolean }> = ({ paused }) =>
                         alignItems: 'center', justifyContent: 'center'
                     }}>
                         <h2>{uiState.state === 'cleared' ? 'WAVE CLEARED!' : 'GAME OVER'}</h2>
-                        {uiState.state === 'gameover' && <RetroButton onClick={() => window.location.reload()}>RETRY</RetroButton>}
+                        {uiState.state === 'gameover' && <RetroButton onClick={() => window.location.reload()}>もういちど</RetroButton>}
                         <br />
-                        <RetroButton variant="secondary" onClick={() => navigate('/menu')}>EXIT</RetroButton>
+                        <RetroButton variant="secondary" onClick={() => navigate('/menu')}>やめる</RetroButton>
                     </div>
                 )
             }

@@ -81,7 +81,7 @@ export const QuickReflexGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
                         <h2>はやい!</h2>
                         <RetroButton onClick={() => window.location.reload()}>リトライ</RetroButton>
                         <br />
-                        <RetroButton variant="secondary" onClick={() => navigate('/menu')}>EXIT</RetroButton>
+                        <RetroButton variant="secondary" onClick={() => navigate('/menu')}>やめる</RetroButton>
                     </div>
                 )}
             </div>

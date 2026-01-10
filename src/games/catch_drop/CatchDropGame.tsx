@@ -160,9 +160,9 @@ export const CatchDropGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
                     alignItems: 'center', justifyContent: 'center'
                 }}>
                     <h2>GAME OVER</h2>
-                    <RetroButton onClick={() => window.location.reload()}>RETRY</RetroButton>
+                    <RetroButton onClick={() => window.location.reload()}>もういちど</RetroButton>
                     <br />
-                    <RetroButton variant="secondary" onClick={() => navigate('/menu')}>EXIT</RetroButton>
+                    <RetroButton variant="secondary" onClick={() => navigate('/menu')}>やめる</RetroButton>
                 </div>
             )}
         </div>

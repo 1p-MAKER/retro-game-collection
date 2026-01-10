@@ -204,9 +204,9 @@ export const WhacAMoleGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
                     alignItems: 'center', justifyContent: 'center'
                 }}>
                     <h2>{uiState.state === 'cleared' ? 'CLEARED!' : 'GAME OVER'}</h2>
-                    <RetroButton onClick={() => window.location.reload()}>RETRY</RetroButton>
+                    <RetroButton onClick={() => window.location.reload()}>もういちど</RetroButton>
                     <br />
-                    <RetroButton variant="secondary" onClick={() => navigate('/menu')}>EXIT</RetroButton>
+                    <RetroButton variant="secondary" onClick={() => navigate('/menu')}>やめる</RetroButton>
                 </div>
             )}
         </div>
