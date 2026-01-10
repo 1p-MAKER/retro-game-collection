@@ -1,9 +1,9 @@
 import { SoundGenerator } from '../../audio/SoundGenerator';
 
-const GRAVITY = 0.1;
-const THRUST = -2.5;
+const GRAVITY = 0.04;
+const THRUST = -0.07;
 const SCROLL_SPEED = 2;
-const TERRAIN_STEP = 10; // Width of each terrain slice
+const TERRAIN_STEP = 10;
 const MIN_GAP = 140;
 
 export class SkyNavigatorLogic {
@@ -51,17 +51,17 @@ export class SkyNavigatorLogic {
     }
 
     generateTerrainSlice(xOffset: number) {
-        // Slowly drift ceiling and floor
+        // 地形変動を激しく（±50）
         if (Math.abs(this.targetCeiling - this.ceilingY) < 5) {
-            this.targetCeiling = 20 + Math.random() * 150;
+            this.targetCeiling = 20 + Math.random() * 200; // より広い範囲
         }
         if (Math.abs(this.targetFloor - this.floorY) < 5) {
-            this.targetFloor = 300 + Math.random() * 160;
+            this.targetFloor = 280 + Math.random() * 180; // より広い範囲
         }
 
-        // Smooth approach
-        this.ceilingY += (this.targetCeiling - this.ceilingY) * 0.05;
-        this.floorY += (this.targetFloor - this.floorY) * 0.05;
+        // 変動を速く（±50程度の挙動）
+        this.ceilingY += (this.targetCeiling - this.ceilingY) * 0.08;
+        this.floorY += (this.targetFloor - this.floorY) * 0.08;
 
         // Ensure gap
         if (this.floorY - this.ceilingY < MIN_GAP) {
@@ -80,7 +80,7 @@ export class SkyNavigatorLogic {
         if (this.gameState === 'paused') this.gameState = 'playing';
         if (this.gameState !== 'playing') return;
 
-        this.velocity = THRUST;
+        this.velocity = Math.max(this.velocity + THRUST, -2.5); // 上昇速度キャップ
         this.sound.playTone(150, 'sawtooth', 0.05);
     }
 
@@ -90,6 +90,7 @@ export class SkyNavigatorLogic {
 
         // Physics
         this.velocity += GRAVITY;
+        this.velocity = Math.min(this.velocity, 3); // 下降速度キャップ
         this.y += this.velocity;
 
         // Scroll

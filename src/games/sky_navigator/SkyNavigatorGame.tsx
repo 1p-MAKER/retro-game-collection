@@ -42,13 +42,13 @@ export const SkyNavigatorGame: React.FC<{ paused?: boolean }> = ({ paused }) => 
         if (!gameLogic.current) return;
         const g = gameLogic.current;
 
-        // Cave BG
-        ctx.fillStyle = '#1D2B53';
+        // 洞窟背景（暗め）
+        ctx.fillStyle = '#2c2c3e';
         ctx.fillRect(0, 0, 320, 480);
 
-        // Terrain
-        ctx.fillStyle = '#83769C';
-        ctx.strokeStyle = '#29ADFF';
+        // 地形（茶色の岩）
+        ctx.fillStyle = '#8B5E3C';
+        ctx.strokeStyle = '#5D4037';
 
         // Draw ceiling and floor polygons
         // Optimization: draw connected polygon for better visual
