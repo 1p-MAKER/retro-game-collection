@@ -81,6 +81,40 @@ export class SoundGenerator {
     public playHit() {
         this.playNoise(0.1);
     }
+
+    public playTick() {
+        this.playTone(440, 'sine', 0.05);
+    }
+
+    public playStart() {
+        // ファンファーレ風のアルペジオ
+        this.playTone(523, 'square', 0.1); // C5
+        setTimeout(() => this.playTone(659, 'square', 0.1), 100); // E5
+        setTimeout(() => this.playTone(784, 'square', 0.15), 200); // G5
+        setTimeout(() => this.playTone(1047, 'square', 0.2), 300); // C6
+    }
+
+    public playClear() {
+        // 勝利音
+        this.playTone(784, 'square', 0.1);
+        setTimeout(() => this.playTone(988, 'square', 0.1), 100);
+        setTimeout(() => this.playTone(1175, 'square', 0.15), 200);
+        setTimeout(() => this.playTone(1568, 'square', 0.25), 300);
+    }
+
+    public playPowerUp() {
+        // 上昇音
+        this.playTone(440, 'sawtooth', 0.08);
+        setTimeout(() => this.playTone(554, 'sawtooth', 0.08), 50);
+        setTimeout(() => this.playTone(659, 'sawtooth', 0.08), 100);
+        setTimeout(() => this.playTone(880, 'sawtooth', 0.12), 150);
+    }
+
+    public playGunshot() {
+        // 射撃音（ノイズ + 低音）
+        this.playNoise(0.15);
+        this.playTone(80, 'sawtooth', 0.1);
+    }
 }
 
 export const soundManager = new SoundGenerator();

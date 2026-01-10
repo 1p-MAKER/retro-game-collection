@@ -105,8 +105,8 @@ export const EndlessJumperGame: React.FC<{ paused?: boolean }> = ({ paused }) =>
             <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} paused={paused} />
 
             <div style={{ position: 'absolute', bottom: 20, width: '100%', display: 'flex', justifyContent: 'space-between', padding: '0 20px', pointerEvents: 'none', opacity: 0.5 }}>
-                <span style={{ color: 'white', fontSize: '2rem' }}>◀ HOLD</span>
-                <span style={{ color: 'white', fontSize: '2rem' }}>HOLD ▶</span>
+                <span style={{ color: 'white', fontSize: '2rem' }}>◀ なが押し</span>
+                <span style={{ color: 'white', fontSize: '2rem' }}>なが押し ▶</span>
             </div>
 
             {uiState.state === 'gameover' && (

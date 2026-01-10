@@ -2,19 +2,19 @@ import React, { useEffect, useRef, useState } from 'react';
 import { GameCanvas } from '../../components/layout/GameCanvas';
 import { SkyNavigatorLogic } from './SkyNavigatorLogic';
 import { soundManager } from '../../audio/SoundGenerator';
-import { RetroButton } from '../../components/ui/RetroButton';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/useGameStore';
+import { RankingDisplay } from '../../components/ui/RankingDisplay';
 
 export const SkyNavigatorGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     const navigate = useNavigate();
-    const { updateGameProgress } = useGameStore();
+    const { } = useGameStore();
     const gameLogic = useRef<SkyNavigatorLogic | null>(null);
     const [uiState, setUiState] = useState({ score: 0, state: 'paused' });
     const isPressing = useRef(false);
 
     useEffect(() => {
-        gameLogic.current = new SkyNavigatorLogic(soundManager, 1);
+        gameLogic.current = new SkyNavigatorLogic(soundManager);
         setUiState({ score: 0, state: 'paused' });
     }, []);
 
@@ -33,10 +33,8 @@ export const SkyNavigatorGame: React.FC<{ paused?: boolean }> = ({ paused }) => 
                 state: gameLogic.current.gameState
             });
 
-            if (gameLogic.current.gameState === 'gameover') {
-                // Save high score
-                updateGameProgress('sky_navigator', 1, gameLogic.current.score);
-            }
+            // Logic class handles death; Game component handles high score submission via RankingDisplay
+            // We just need to ensure we don't double-submit or anything, but RankingDisplay handles input
         }
     };
 
@@ -44,34 +42,56 @@ export const SkyNavigatorGame: React.FC<{ paused?: boolean }> = ({ paused }) => 
         if (!gameLogic.current) return;
         const g = gameLogic.current;
 
-        // Sky BG
-        ctx.fillStyle = '#29ADFF';
+        // Cave BG
+        ctx.fillStyle = '#1D2B53';
         ctx.fillRect(0, 0, 320, 480);
 
-        // Obstacles
-        ctx.fillStyle = '#008751';
-        g.obstacles.forEach(ob => {
-            // Top pole
-            ctx.fillRect(ob.x, 0, 40, ob.topH);
-            // Bottom pole
-            ctx.fillRect(ob.x, ob.bottomY, 40, 480 - ob.bottomY);
+        // Terrain
+        ctx.fillStyle = '#83769C';
+        ctx.strokeStyle = '#29ADFF';
 
-            // Outline
-            ctx.strokeStyle = '#000';
-            ctx.strokeRect(ob.x, 0, 40, ob.topH);
-            ctx.strokeRect(ob.x, ob.bottomY, 40, 480 - ob.bottomY);
-        });
+        // Draw ceiling and floor polygons
+        // Optimization: draw connected polygon for better visual
 
-        // Player Plane
-        const px = 50;
-        const py = g.y;
-        ctx.fillStyle = '#FFEC27';
+        // Ceiling
         ctx.beginPath();
-        ctx.moveTo(px + 10, py);
-        ctx.lineTo(px - 10, py - 8);
-        ctx.lineTo(px - 10, py + 8);
+        ctx.moveTo(0, 0);
+        g.terrain.forEach(t => {
+            ctx.lineTo(t.x, t.topH);
+        });
+        ctx.lineTo(320, 0);
         ctx.fill();
         ctx.stroke();
+
+        // Floor
+        ctx.beginPath();
+        ctx.moveTo(0, 480);
+        g.terrain.forEach(t => {
+            ctx.lineTo(t.x, t.bottomY);
+        });
+        ctx.lineTo(320, 480);
+        ctx.fill();
+        ctx.stroke();
+
+        // Player Ship
+        const px = 50;
+        const py = g.y;
+        ctx.fillStyle = '#FF004D';
+        ctx.beginPath();
+        ctx.moveTo(px + 10, py);
+        ctx.lineTo(px - 10, py - 6);
+        ctx.lineTo(px - 10, py + 6);
+        ctx.fill();
+
+        // Engine flame
+        if (isPressing.current && !paused) {
+            ctx.fillStyle = '#FFEC27';
+            ctx.beginPath();
+            ctx.moveTo(px - 10, py);
+            ctx.lineTo(px - 20, py - 4);
+            ctx.lineTo(px - 20, py + 4);
+            ctx.fill();
+        }
     };
 
     const handleStartPress = () => { if (!paused) isPressing.current = true; };
@@ -90,20 +110,24 @@ export const SkyNavigatorGame: React.FC<{ paused?: boolean }> = ({ paused }) => 
 
             <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} paused={paused} />
 
-            <div style={{ position: 'absolute', bottom: 20, width: '100%', textAlign: 'center', color: 'white', opacity: 0.8, pointerEvents: 'none' }}>
-                HOLD TO FLY UP
+            <div style={{ position: 'absolute', bottom: 20, width: '100%', textAlign: 'center', color: '#83769C', opacity: 0.8, pointerEvents: 'none', fontFamily: '"Pico8", sans-serif' }}>
+                おしてとぶ
             </div>
 
             {uiState.state === 'gameover' && (
                 <div style={{
                     position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-                    backgroundColor: 'rgba(0,0,0,0.8)', color: 'white', display: 'flex', flexDirection: 'column',
-                    alignItems: 'center', justifyContent: 'center'
+                    backgroundColor: 'rgba(0,0,0,0.85)', color: 'white', display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center', zIndex: 100
                 }}>
-                    <h2>GAME OVER</h2>
-                    <RetroButton onClick={() => window.location.reload()}>RETRY</RetroButton>
-                    <br />
-                    <RetroButton variant="secondary" onClick={() => navigate('/menu')}>EXIT</RetroButton>
+                    <RankingDisplay
+                        gameId="sky_navigator"
+                        highlightScore={uiState.score}
+                        inputScore={uiState.score} // Always offer input for simplicity or check if highscore
+                        onScoreSubmitted={() => { }}
+                        onRetry={() => window.location.reload()}
+                        onExit={() => navigate('/')}
+                    />
                 </div>
             )}
         </div>

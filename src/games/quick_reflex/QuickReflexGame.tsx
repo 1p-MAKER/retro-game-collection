@@ -63,23 +63,23 @@ export const QuickReflexGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
             <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} paused={paused} />
 
             <div style={{ position: 'absolute', top: 0, left: 0, zIndex: 10, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-                {uiState.state === 'wait' && <h1 style={{ color: 'white' }}>WAIT...</h1>}
-                {uiState.state === 'go' && <h1 style={{ color: 'white', fontSize: '4rem' }}>GO!!!</h1>}
+                {uiState.state === 'wait' && <h1 style={{ color: 'white' }}>まて...</h1>}
+                {uiState.state === 'go' && <h1 style={{ color: 'white', fontSize: '4rem' }}>オセ!!!</h1>}
 
                 {uiState.state === 'result' && (
                     <div style={{ textAlign: 'center', backgroundColor: 'rgba(0,0,0,0.8)', padding: 20, borderRadius: 10, color: 'white', pointerEvents: 'auto' }}>
                         <h2>{uiState.time} ms</h2>
-                        <p>{uiState.time < 200 ? 'GODLIKE!' : uiState.time < 300 ? 'FAST!' : 'AVERAGE'}</p>
-                        <RetroButton onClick={() => window.location.reload()}>RETRY</RetroButton>
+                        <p>{uiState.time < 200 ? 'カミワザ!' : uiState.time < 300 ? 'ハヤイ!' : 'フツウ'}</p>
+                        <RetroButton onClick={() => window.location.reload()}>リトライ</RetroButton>
                         <br />
-                        <RetroButton variant="secondary" onClick={() => navigate('/menu')}>EXIT</RetroButton>
+                        <RetroButton variant="secondary" onClick={() => navigate('/menu')}>やめる</RetroButton>
                     </div>
                 )}
 
                 {uiState.state === 'falsestart' && (
                     <div style={{ textAlign: 'center', backgroundColor: 'rgba(0,0,0,0.8)', padding: 20, borderRadius: 10, color: 'white', pointerEvents: 'auto' }}>
-                        <h2>TOO EARLY!</h2>
-                        <RetroButton onClick={() => window.location.reload()}>RETRY</RetroButton>
+                        <h2>はやい!</h2>
+                        <RetroButton onClick={() => window.location.reload()}>リトライ</RetroButton>
                         <br />
                         <RetroButton variant="secondary" onClick={() => navigate('/menu')}>EXIT</RetroButton>
                     </div>

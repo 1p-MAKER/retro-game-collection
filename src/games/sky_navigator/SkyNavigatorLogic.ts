@@ -1,11 +1,10 @@
 import { SoundGenerator } from '../../audio/SoundGenerator';
 
-const GRAVITY = 0.15;
-const THRUST = -0.3;
-const SCROLL_SPEED = 2; // Pixels per frame
-const OBSTACLE_GAP = 120;
-const OBSTACLE_WIDTH = 40;
-const OBSTACLE_INTERVAL = 200; // Pixels distance between obstacles
+const GRAVITY = 0.1;
+const THRUST = -2.5;
+const SCROLL_SPEED = 2;
+const TERRAIN_STEP = 10; // Width of each terrain slice
+const MIN_GAP = 140;
 
 export class SkyNavigatorLogic {
     public y: number = 240;
@@ -13,41 +12,66 @@ export class SkyNavigatorLogic {
     public score: number = 0;
     public gameState: 'playing' | 'gameover' | 'paused' = 'paused';
 
-    // Arrays of {x, topHeight, bottomHeight}
-    // topHeight is height of top obstacle, bottomHeight is y start of bottom obstacle
-    public obstacles: { x: number, topH: number, bottomY: number, passed: boolean }[] = [];
+    // Terrain slices: { x, topH, bottomY }
+    // continuous cave ceiling (topH) and floor (bottomY)
+    public terrain: { x: number, topH: number, bottomY: number, passed: boolean }[] = [];
 
     private sound: SoundGenerator;
     private distanceTraveled: number = 0;
-    private level: number = 1;
-
-    constructor(sound: SoundGenerator, level: number = 1) {
+    constructor(sound: SoundGenerator) {
         this.sound = sound;
-        this.level = level;
         this.reset();
     }
+
+    // Noise generation state
+    private ceilingY: number = 50;
+    private floorY: number = 430;
+    private targetCeiling: number = 50;
+    private targetFloor: number = 430;
 
     reset() {
         this.y = 240;
         this.velocity = 0;
         this.score = 0;
         this.distanceTraveled = 0;
-        this.obstacles = [];
+        this.terrain = [];
         this.gameState = 'paused';
-        this.spawnObstacle(400); // Initial obstacle ahead
+
+        // Initial flat tunnel
+        this.ceilingY = 50;
+        this.floorY = 430;
+        for (let x = 0; x < 400; x += TERRAIN_STEP) {
+            this.terrain.push({
+                x,
+                topH: 50,
+                bottomY: 430,
+                passed: false
+            });
+        }
     }
 
-    spawnObstacle(xOffset: number) {
-        // Gap gets smaller as level increases (min 80)
-        const gap = Math.max(80, OBSTACLE_GAP - (this.level * 2));
-        const minH = 50;
-        const availableHeight = 480 - gap - (minH * 2);
-        const topH = minH + Math.random() * availableHeight;
+    generateTerrainSlice(xOffset: number) {
+        // Slowly drift ceiling and floor
+        if (Math.abs(this.targetCeiling - this.ceilingY) < 5) {
+            this.targetCeiling = 20 + Math.random() * 150;
+        }
+        if (Math.abs(this.targetFloor - this.floorY) < 5) {
+            this.targetFloor = 300 + Math.random() * 160;
+        }
 
-        this.obstacles.push({
+        // Smooth approach
+        this.ceilingY += (this.targetCeiling - this.ceilingY) * 0.05;
+        this.floorY += (this.targetFloor - this.floorY) * 0.05;
+
+        // Ensure gap
+        if (this.floorY - this.ceilingY < MIN_GAP) {
+            this.floorY = this.ceilingY + MIN_GAP;
+        }
+
+        this.terrain.push({
             x: xOffset,
-            topH: topH,
-            bottomY: topH + gap,
+            topH: this.ceilingY,
+            bottomY: this.floorY,
             passed: false
         });
     }
@@ -56,8 +80,8 @@ export class SkyNavigatorLogic {
         if (this.gameState === 'paused') this.gameState = 'playing';
         if (this.gameState !== 'playing') return;
 
-        this.velocity = Math.min(this.velocity + THRUST, -4); // Cap upward speed
-        this.sound.playTone(100 + Math.random() * 50, 'sawtooth', 0.05); // Engine noise
+        this.velocity = THRUST;
+        this.sound.playTone(150, 'sawtooth', 0.05);
     }
 
     public update(deltaTime: number) {
@@ -68,52 +92,45 @@ export class SkyNavigatorLogic {
         this.velocity += GRAVITY;
         this.y += this.velocity;
 
-        // Floor/Ceiling collision
-        if (this.y < 0 || this.y > 480) {
-            this.die();
-            return;
-        }
-
-        // Scroll & Obstacles
+        // Scroll
         this.distanceTraveled += SCROLL_SPEED;
 
-        // Move obstacles
-        for (let i = this.obstacles.length - 1; i >= 0; i--) {
-            const ob = this.obstacles[i];
-            ob.x -= SCROLL_SPEED;
+        // Move terrain
+        for (let i = this.terrain.length - 1; i >= 0; i--) {
+            const t = this.terrain[i];
+            t.x -= SCROLL_SPEED;
 
-            // Collision check
-            // Plane is approx circles at (50, y) radius 10
+            // Collision check (Player is approx 20x10)
             const px = 50;
-            const pr = 10;
+            const py = this.y;
 
-            // AABB check
-            if (
-                px + pr > ob.x && px - pr < ob.x + OBSTACLE_WIDTH &&
-                (this.y - pr < ob.topH || this.y + pr > ob.bottomY)
-            ) {
-                this.die();
+            // Check only near slices
+            if (t.x >= px - 10 && t.x <= px + 10) {
+                if (py - 5 < t.topH || py + 5 > t.bottomY) {
+                    this.die();
+                }
             }
 
             // Score check
-            if (!ob.passed && ob.x + OBSTACLE_WIDTH < px) {
-                this.score++;
-                ob.passed = true;
-                this.sound.playTone(880, 'square', 0.1);
+            if (!t.passed && t.x < px) {
+                // Score accumulates faster with terrain, so maybe every 100px?
+                // Let's just track distance score for now
+                t.passed = true;
+                if (this.distanceTraveled % 100 < SCROLL_SPEED) {
+                    this.score++;
+                }
             }
 
             // Cleanup
-            if (ob.x < -OBSTACLE_WIDTH) {
-                this.obstacles.splice(i, 1);
+            if (t.x < -TERRAIN_STEP) {
+                this.terrain.splice(i, 1);
             }
         }
 
         // Spawn new
-        const lastOb = this.obstacles[this.obstacles.length - 1];
-        if (lastOb && (320 - lastOb.x) > OBSTACLE_INTERVAL) { // basic spawning logic
-            this.spawnObstacle(320 + 50);
-        } else if (this.obstacles.length === 0) {
-            this.spawnObstacle(320 + 50);
+        const lastT = this.terrain[this.terrain.length - 1];
+        if (lastT && (lastT.x < 320 + TERRAIN_STEP)) {
+            this.generateTerrainSlice(lastT.x + TERRAIN_STEP);
         }
     }
 

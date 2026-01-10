@@ -3,10 +3,15 @@ import { persist } from 'zustand/middleware';
 
 export type Language = 'en' | 'ja' | 'ja-kana';
 
+export interface RankingEntry {
+  name: string;
+  score: number;
+}
+
 export interface GameProgress {
   gameId: string;
   unlockedStages: number; // 0-indexed, or max stage cleared
-  highScores: number[]; // Top 5 scores
+  rankings: RankingEntry[]; // Top 5 scores with names
 }
 
 export interface AppState {
@@ -15,14 +20,14 @@ export interface AppState {
   bgmEnabled: boolean;
   playTimeLimitMin: number; // 15, 30, 60, or 0 (unlimited)
   parentalCode: string; // Simple check for now
-  
+
   gamesProgress: Record<string, GameProgress>;
 
   setLanguage: (lang: Language) => void;
   toggleSound: () => void;
   toggleBgm: () => void;
   setPlayTimeLimit: (minutes: number) => void;
-  updateGameProgress: (gameId: string, stage: number, score: number) => void;
+  updateGameProgress: (gameId: string, stage: number, score: number, name?: string) => void;
   resetAllData: () => void;
 }
 
@@ -40,15 +45,17 @@ export const useGameStore = create<AppState>()(
       toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
       toggleBgm: () => set((state) => ({ bgmEnabled: !state.bgmEnabled })),
       setPlayTimeLimit: (minutes) => set({ playTimeLimitMin: minutes }),
-      
-      updateGameProgress: (gameId, stage, score) => set((state) => {
-        const currentProgress = state.gamesProgress[gameId] || { gameId, unlockedStages: 1, highScores: [] };
+
+      updateGameProgress: (gameId, stage, score, name = 'YOU') => set((state) => {
+        const currentProgress = state.gamesProgress[gameId] || { gameId, unlockedStages: 1, rankings: [] };
         // Update unlocked stages (max)
         const newUnlocked = Math.max(currentProgress.unlockedStages, stage + 1);
-        
-        // Update High Scores (keep top 5)
-        const newScores = [...currentProgress.highScores, score]
-          .sort((a, b) => b - a)
+
+        // Update Rankings (keep top 5)
+        // If score is high enough to enter
+        const newEntry = { name, score };
+        const newRankings = [...(currentProgress.rankings || []), newEntry]
+          .sort((a, b) => b.score - a.score)
           .slice(0, 5);
 
         return {
@@ -57,7 +64,7 @@ export const useGameStore = create<AppState>()(
             [gameId]: {
               ...currentProgress,
               unlockedStages: newUnlocked,
-              highScores: newScores
+              rankings: newRankings
             }
           }
         };

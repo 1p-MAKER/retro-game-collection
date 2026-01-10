@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { GameCanvas } from '../../components/layout/GameCanvas';
-import { SnakeLogic, type Direction } from './SnakeLogic';
+import { RetroFrame } from '../../components/layout/RetroFrame';
+import { SnakeLogic } from './SnakeLogic';
 import { soundManager } from '../../audio/SoundGenerator';
 import { loadTransparentSprite } from '../../utils/imageProcessing';
 import { RetroButton } from '../../components/ui/RetroButton';
@@ -124,16 +125,15 @@ export const SnakeGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
                 ctx.save();
                 ctx.translate(s.x * CELL + CELL / 2, s.y * CELL + CELL / 2);
                 // Rotate based on direction
+                // Rotate based on direction
                 let angle = 0;
-                switch (g.direction) {
-                    case 'UP': angle = -Math.PI / 2; break;
-                    case 'DOWN': angle = Math.PI / 2; break;
-                    case 'LEFT': angle = Math.PI; break;
-                    case 'RIGHT': angle = 0; break;
-                }
-                ctx.rotate(angle);
+                if (g.direction === 'UP') angle = 180;
+                if (g.direction === 'DOWN') angle = 0;
+                if (g.direction === 'LEFT') angle = 90;
+                if (g.direction === 'RIGHT') angle = -90;
+
+                ctx.rotate(angle * Math.PI / 180);
                 // Draw image centered
-                // Assuming sprite faces RIGHT by default as per prompt
                 ctx.drawImage(headSprite.current, -CELL / 2, -CELL / 2, CELL, CELL);
                 ctx.restore();
             } else if (i > 0 && bodySprite.current) {
@@ -150,43 +150,46 @@ export const SnakeGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
         });
     };
 
-    const handleDir = (d: Direction) => {
-        if (paused) return;
-        gameLogic.current?.setDirection(d);
-    };
+
 
     return (
-        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-            <div style={{ position: 'absolute', top: 10, left: 10, color: 'white', zIndex: 10, fontFamily: 'monospace' }}>Score: {uiState.score} LV: {uiState.level}</div>
+        <RetroFrame
+            title="SNAKE"
+            onBack={() => navigate('/')}
+        // className={styles.retroFrame} // styles import missing, skipping class for now as inline style works
+        >
+            <div style={{ position: 'relative', width: '100%', height: '100%', touchAction: 'none' }}>
+                <div style={{ position: 'absolute', top: 10, left: 10, color: 'white', zIndex: 10, fontFamily: 'monospace' }}>Score: {uiState.score} LV: {uiState.level}</div>
 
-            <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} paused={paused} />
+                <GameCanvas width={320} height={480} onUpdate={handleUpdate} onDraw={handleDraw} paused={paused} />
 
-            {/* D-Pad Overlay for Mobile */}
-            <div style={{
-                position: 'absolute', bottom: 20, left: 20,
-                display: 'grid', gridTemplateColumns: 'repeat(3, 50px)', gridTemplateRows: 'repeat(2, 50px)',
-                gap: '5px', opacity: 0.7
-            }}>
-                <div />
-                <RetroButton size="sm" onClick={() => handleDir('UP')}>▲</RetroButton>
-                <div />
-                <RetroButton size="sm" onClick={() => handleDir('LEFT')}>◀</RetroButton>
-                <RetroButton size="sm" onClick={() => handleDir('DOWN')}>▼</RetroButton>
-                <RetroButton size="sm" onClick={() => handleDir('RIGHT')}>▶</RetroButton>
-            </div>
-
-            {(uiState.state === 'gameover' || uiState.state === 'cleared') && (
                 <div style={{
-                    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-                    backgroundColor: 'rgba(0,0,0,0.8)', color: 'white', display: 'flex', flexDirection: 'column',
-                    alignItems: 'center', justifyContent: 'center'
+                    position: 'absolute',
+                    bottom: 10,
+                    width: '100%',
+                    textAlign: 'center',
+                    color: '#83769C',
+                    fontFamily: '"Pico8", sans-serif',
+                    fontSize: '14px',
+                    opacity: 0.8,
+                    pointerEvents: 'none'
                 }}>
-                    <h2>{uiState.state === 'cleared' ? 'NEXT STAGE!' : 'GAME OVER'}</h2>
-                    {uiState.state === 'gameover' && <RetroButton onClick={() => window.location.reload()}>RETRY</RetroButton>}
-                    <br />
-                    <RetroButton variant="secondary" onClick={() => navigate('/menu')}>EXIT</RetroButton>
+                    スワイプで移動
                 </div>
-            )}
-        </div>
+
+                {(uiState.state === 'gameover' || uiState.state === 'cleared') && (
+                    <div style={{
+                        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                        backgroundColor: 'rgba(0,0,0,0.8)', color: 'white', display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center'
+                    }}>
+                        <h2>{uiState.state === 'cleared' ? 'NEXT STAGE!' : 'GAME OVER'}</h2>
+                        {uiState.state === 'gameover' && <RetroButton onClick={() => window.location.reload()}>RETRY</RetroButton>}
+                        <br />
+                        <RetroButton variant="secondary" onClick={() => navigate('/menu')}>EXIT</RetroButton>
+                    </div>
+                )}
+            </div>
+        </RetroFrame>
     );
 };

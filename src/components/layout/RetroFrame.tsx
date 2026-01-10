@@ -6,9 +6,12 @@ import { RetroButton } from '../ui/RetroButton';
 
 interface RetroFrameProps {
     children: React.ReactNode;
+    title?: string;
+    onBack?: () => void;
+    className?: string;
 }
 
-export const RetroFrame: React.FC<RetroFrameProps> = ({ children }) => {
+export const RetroFrame: React.FC<RetroFrameProps> = ({ children, title, onBack, className }) => {
     const { playTimeLimitMin } = useGameStore();
     const [_, setElapsed] = useState(0);
     const [isLocked, setIsLocked] = useState(false);
@@ -41,7 +44,7 @@ export const RetroFrame: React.FC<RetroFrameProps> = ({ children }) => {
     };
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} ${className || ''}`}>
             <div className={styles.bezel}>
                 <div className={styles.screen}>
                     {children}
@@ -65,8 +68,18 @@ export const RetroFrame: React.FC<RetroFrameProps> = ({ children }) => {
                             )}
                         </div>
                     )}
+
+                    {onBack && (
+                        <RetroButton
+                            style={{ position: 'absolute', top: 10, right: 10, zIndex: 90 }}
+                            size="sm"
+                            onClick={onBack}
+                        >
+                            EXIT
+                        </RetroButton>
+                    )}
                 </div>
-                <div className={styles.logo}>RETRO-11</div>
+                <div className={styles.logo}>{title || 'RETRO-11'}</div>
             </div>
         </div>
     );

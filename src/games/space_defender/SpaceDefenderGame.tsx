@@ -166,21 +166,23 @@ export const SpaceDefenderGame: React.FC<{ paused?: boolean }> = ({ paused }) =>
 
             {/* HUD */}
             <div style={{ position: 'absolute', bottom: 10, left: 10, color: 'white', opacity: 0.7, pointerEvents: 'none' }}>
-                DRAG TO MOVE / RELEASE TO SHOOT
+                ドラッグでいどう / はなしてショット
             </div>
 
-            {(uiState.state === 'gameover' || uiState.state === 'cleared') && (
-                <div style={{
-                    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-                    backgroundColor: 'rgba(0,0,0,0.8)', color: 'white', display: 'flex', flexDirection: 'column',
-                    alignItems: 'center', justifyContent: 'center'
-                }}>
-                    <h2>{uiState.state === 'cleared' ? 'WAVE CLEARED!' : 'GAME OVER'}</h2>
-                    {uiState.state === 'gameover' && <RetroButton onClick={() => window.location.reload()}>RETRY</RetroButton>}
-                    <br />
-                    <RetroButton variant="secondary" onClick={() => navigate('/menu')}>EXIT</RetroButton>
-                </div>
-            )}
-        </div>
+            {
+                (uiState.state === 'gameover' || uiState.state === 'cleared') && (
+                    <div style={{
+                        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                        backgroundColor: 'rgba(0,0,0,0.8)', color: 'white', display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center'
+                    }}>
+                        <h2>{uiState.state === 'cleared' ? 'WAVE CLEARED!' : 'GAME OVER'}</h2>
+                        {uiState.state === 'gameover' && <RetroButton onClick={() => window.location.reload()}>RETRY</RetroButton>}
+                        <br />
+                        <RetroButton variant="secondary" onClick={() => navigate('/menu')}>EXIT</RetroButton>
+                    </div>
+                )
+            }
+        </div >
     );
 };

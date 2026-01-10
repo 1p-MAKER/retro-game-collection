@@ -204,7 +204,7 @@ export const BreakoutGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
                     backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center', gap: '20px'
                 }}>
-                    <h2 style={{ color: uiState.state === 'cleared' ? '#00E436' : '#FF004D', fontSize: '2rem' }}>
+                    <h2 style={{ color: uiState.state === 'cleared' ? '#FFEC27' : '#FF004D', fontSize: '2rem' }}>
                         {uiState.state === 'cleared' ? 'STAGE CLEAR!' : 'GAME OVER'}
                     </h2>
                     {uiState.state === 'gameover' && (

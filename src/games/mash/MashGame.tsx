@@ -78,18 +78,37 @@ export const MashGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
                 </div>
 
                 {uiState.state !== 'gameover' ? (
-                    <button
-                        onMouseDown={handleMash}
-                        onTouchStart={handleMash}
+                    <div
+                        onMouseDown={(e) => {
+                            e.currentTarget.style.transform = 'translateY(10px)';
+                            handleMash();
+                        }}
+                        onMouseUp={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                        }}
+                        onTouchStart={(e) => {
+                            e.currentTarget.style.transform = 'translateY(10px)';
+                            handleMash();
+                        }}
+                        onTouchEnd={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                        }}
                         style={{
                             width: 200, height: 200, borderRadius: '50%',
-                            backgroundColor: '#FF004D', border: '10px solid #FFF',
+                            backgroundColor: '#FF004D',
+                            border: '10px solid #FFF',
+                            boxShadow: '0 10px 0 #7F002A, 0 10px 0 10px #000',
                             color: 'white', fontSize: '2rem', fontFamily: '"Pico8", sans-serif',
-                            boxShadow: '0 10px 0 #7F002A'
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer', userSelect: 'none',
+                            transition: 'transform 0.05s'
                         }}
                     >
                         PUSH!
-                    </button>
+                    </div>
                 ) : (
                     <div style={{ textAlign: 'center', backgroundColor: 'rgba(0,0,0,0.8)', padding: 20, borderRadius: 10, color: 'white' }}>
                         <h2>FINISHED!</h2>
