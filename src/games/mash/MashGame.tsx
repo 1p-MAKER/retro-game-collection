@@ -57,11 +57,11 @@ export const MashGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
     };
 
     const getRank = (score: number) => {
-        if (score > 130) return "S - GODLIKE";
-        if (score > 100) return "A - AMAZING";
-        if (score > 80) return "B - GREAT";
-        if (score > 50) return "C - GOOD";
-        return "D - TRY HARDER";
+        if (score > 130) return "S - かみ！";
+        if (score > 100) return "A - すばらしい！";
+        if (score > 80) return "B - いいかんじ！";
+        if (score > 50) return "C - まあまあ";
+        return "D - がんばれ！";
     };
 
     return (
@@ -70,7 +70,7 @@ export const MashGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
 
             <div style={{ position: 'absolute', top: 0, left: 0, zIndex: 10, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ fontSize: '2rem', color: 'white', marginBottom: 20 }}>
-                    TIME: {uiState.timeLeft.toFixed(1)}
+                    のこり: {uiState.timeLeft.toFixed(1)}秒
                 </div>
 
                 <div style={{ fontSize: '4rem', color: '#FF004D', marginBottom: 40 }}>
@@ -107,16 +107,16 @@ export const MashGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
                             transition: 'transform 0.05s'
                         }}
                     >
-                        PUSH!
+                        おして
                     </div>
                 ) : (
                     <div style={{ textAlign: 'center', backgroundColor: 'rgba(0,0,0,0.8)', padding: 20, borderRadius: 10, color: 'white' }}>
-                        <h2>FINISHED!</h2>
-                        <p>SCORE: {uiState.count}</p>
-                        <p>RANK: {getRank(uiState.count)}</p>
-                        <RetroButton onClick={() => window.location.reload()}>RETRY</RetroButton>
+                        <h2>終了！</h2>
+                        <p>スコア: {uiState.count}</p>
+                        <p>ランク: {getRank(uiState.count)}</p>
+                        <RetroButton onClick={() => window.location.reload()}>もういちど</RetroButton>
                         <br />
-                        <RetroButton variant="secondary" onClick={() => navigate('/menu')}>EXIT</RetroButton>
+                        <RetroButton variant="secondary" onClick={() => navigate('/menu')}>やめる</RetroButton>
                     </div>
                 )}
             </div>
