@@ -82,22 +82,27 @@ export const SnakeGame: React.FC<{ paused?: boolean }> = ({ paused }) => {
         if (!gameLogic.current) return;
         const g = gameLogic.current;
 
-        // BG
-        if (bgSprite.current) {
-            const ptrn = ctx.createPattern(bgSprite.current, 'repeat');
-            if (ptrn) {
-                ctx.fillStyle = ptrn;
-                ctx.fillRect(0, 0, 320, 480);
-            } else {
-                ctx.fillStyle = '#008751';
-                ctx.fillRect(0, 0, 320, 480);
-            }
-        } else {
-            ctx.fillStyle = '#1D2B53'; // Fallback
-            ctx.fillRect(0, 0, 320, 480);
+        // 背景（砂色）
+        ctx.fillStyle = '#E6D7AA';
+        ctx.fillRect(0, 0, 320, 480);
+
+        // グリッド線
+        ctx.strokeStyle = '#D4C89A';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 8; i++) {
+            ctx.beginPath();
+            ctx.moveTo(i * 40, 0);
+            ctx.lineTo(i * 40, 480);
+            ctx.stroke();
+        }
+        for (let i = 0; i <= 12; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0, i * 40);
+            ctx.lineTo(320, i * 40);
+            ctx.stroke();
         }
 
-        const CELL = 20;
+        const CELL = 40;
 
         // Walls
         ctx.fillStyle = '#AB5236';

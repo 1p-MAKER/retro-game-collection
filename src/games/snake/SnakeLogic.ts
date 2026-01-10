@@ -1,8 +1,8 @@
 import { SoundGenerator } from '../../audio/SoundGenerator';
 
-const COLS = 16;
-const ROWS = 24;
-// Canvas virtual size: 320x480
+const COLS = 8;
+const ROWS = 12;
+// Canvas virtual size: 320x480 -> CELL = 40px
 
 export type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
 export type GameState = 'playing' | 'gameover' | 'cleared' | 'paused';
